@@ -1,17 +1,21 @@
 // ==UserScript==
 // @name         VU Tools
-// @namespace    http://visual-utopia.com/
-// @version      0.1
-// @description  enter something useful
-// @author       Quirinus
+// @version      0.11
+// @author       Ivan Jelenić (Quirinus)
+// @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
+// @homepage     https://github.com/Quirinus/
+// @namespace    https://github.com/Quirinus/
+// @downloadURL  https://github.com/Quirinus/vuTools/archive/master.zip
+// @supportURL   https://github.com/Quirinus/vuTools/issues
+// @icon         http://visual-utopia.com/favicon.ico
 // @match        http://visual-utopia.com/*
-// @require      http://code.jquery.com/jquery-latest.js
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js
 // @grant        none
 // ==/UserScript==
 
 $(document).ready(function ()
 {
-
+    
     var url = window.location.href;
     
     if (url.indexOf('main.asp') != -1)
