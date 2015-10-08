@@ -2,8 +2,7 @@
 A userscript to improve various user interface bits of the Visual Utopia browser game.
 ### Features
 ######Map:
-- army size indicators are white now
-- army movement direction arrow is white now
+- army size indicators, movement direction arrow and army path are white now
 - all armies have **[race]short_player_name** under them now
 - all cities have **[race]city_name**, and then under it **short_player_name**
 
@@ -18,6 +17,12 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - added columns: morale%, productivity%, employement%, population%, land
 (and total land), defense (troops+clickable # of armies)
 - added total tax income and total (mines) gold income
+
+######Training window:
+- for Human players:
+ - added Mobilization training times
+ - added Mobilization warnings
+ - changed Mobilization button title to be more clear
 
 ### Coming up
 - City building window automatic number calculations and suggestions
