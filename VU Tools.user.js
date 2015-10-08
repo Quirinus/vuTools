@@ -34,9 +34,8 @@ $(document).ready(function ()
         var name_separator_pos3 = -1;
         var name_separator_pos4 = -1;
         var name_separator_pos5 = -1;
-        var titles_trim = ['Mr. ', 'Sir ' , 'Lord ' , 'Baron ', 'Duke ' , 'Prince ', 'Ms. ', 'Madam ', 'Lady ', 'Baroness ', 'Baronet ', 'Dame ', 'Duchess ', 'Princess '];
+        var titles_trim = ['Mr. ', 'Sir ' , 'Lord ', 'Duke ' , 'Prince ', 'Ms. ', 'Lady ', 'Duchess ', 'Princess '];
         var titles_len = titles_trim.length;
-    
 
         var armies = $.makeArray($('.armyclick'));
         var army_len = armies.length;
@@ -251,13 +250,9 @@ $(document).ready(function ()
             {
                 ruler_name_space_pos = army_ruler_name.indexOf(' ');
                 if (ruler_name_space_pos != -1)
-                {
                     army_ruler_name = army_ruler_name.substring(0, ruler_name_space_pos);
-                }
                 if (army_ruler_name.length > 10)
-                {
                     army_ruler_name = army_ruler_name.substring(0, 9);
-                }
             }
 
 
@@ -277,6 +272,7 @@ $(document).ready(function ()
 
             $('div[style*="arrow"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)'); //css('z-index', '2'); // and add image map with coordinates from img, rotated for each
             $('img[src*="armysize"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)').css('z-index', '2');
+            $('img[src*="reddot"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)');
 
             $(armies[i]).before('<span style="' + army_style + 'cursor: default; color: white; font-weight: bold; font-size:0.8em; z-index: 10; text-align:center; text-shadow: black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px; -webkit-font-smoothing: antialiased; margin-top: ' + army_margin + ';">' + army_race + army_ruler_name +'</span>');
 
@@ -311,13 +307,9 @@ $(document).ready(function ()
                 {
                     ruler_name_space_pos = ruler_name.indexOf(' ');
                     if (ruler_name_space_pos != -1)
-                    {
                         ruler_name = ruler_name.substring(0, ruler_name_space_pos);
-                    }
                     if (ruler_name.length > 10)
-                    {
                         ruler_name = ruler_name.substring(0, 9);
-                    }
                 }
                 kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3); //needs regex in case kd name has ' of ' in it;
                 citynames[i].innerHTML = race + city_name;
@@ -364,9 +356,7 @@ $(document).ready(function ()
         $("table:nth-of-type(2)").before(breadcrumbs);
         
         if ((url.indexOf('#new') == -1) && (url.indexOf('#bottom') != -1))
-        {
             navigation.find('a[href="#bottom"]').get(0).click();
-        }
     } //topics in subforum
     else if ((url.indexOf('?f=') != -1) || (url.indexOf('?forum=') != -1))
     {
@@ -436,6 +426,7 @@ $(document).ready(function ()
             var cols;
             if (start_row == end_row)
                 end_row++
+            
             for (i = start_row; i < end_row; i++)
             {
                 cols = rows.eq(i).children('th, td');
@@ -471,6 +462,47 @@ $(document).ready(function ()
         window.parent.$('#slot0').css('width', '628px').css('max-width', '628px').css('*width', '628px').css('left', '203px');
         window.parent.$('#id_ifrslot0').css('width', '604px').css('max-width', '604px').css('*width', '604px');
     }
+    
+    if (url.indexOf('train.asp') != -1)
+    {
+        var race = 'human';
+        if (race == 'human') //check by the name of the first unit
+        {
+            //<a href="mobilize.asp?cityID=493418" class="button big city" title="Train troops at normal speed">Go back to normal training speed</a>
+            //<a href="mobilize.asp?cityID=493330" class="button big city" title="Troops will be trained double as fast, but we will lose some of them">Mobilize troops</a>
+        
+            var mobilize = false;
+            if ($('a[href^=mobilize]').text().indexOf('Mobilize') == -1)
+            {
+                mobilize = true;
+                $('a[href^=mobilize]').attr('title', 'When mobilized, troops in training will be trained double as fast, but at a total loss of about 4% of them.\nMobilization training times are shown in red below, and normal training time in gray.');
+                $('a[href^=mobilize]').after('<br><span style="color:red;"><span style="font-weight:bold; text-decoration:underline;">Troops are Mobilized!</span><br>Losing about 4% troops that get trained each day!</span><br>While Mobilized, troops are trained at the rate of 2 days in 1 day.');
+                $('#main > table:last-of-type').before('<span style="color:red;"><span style="font-weight:bold; text-decoration:underline;">Troops are Mobilized!</span><br>Losing about 4% troops that get trained each day!</span><br>While Mobilized, troops are trained at the rate of 2 days in 1 day.');
+            }
+            else
+            {
+                $('a[href^=mobilize]').attr('title', 'Troops already in training will be trained double as fast, but at a total loss of about 4% of them.\nMobilization training times are shown in red below, and normal training time in gray.');   
+            }
+
+            var train_el = '';
+            var training_time = -1;
+            var mtime = -1;
+            for (i = 0; i < 5; i++)
+            {
+                var train_el = $('form table:eq(' + i + ') tr:eq(3) td:eq(2)').get(0);
+                training_time = train_el.innerHTML.match(/\(([0-9]+) days\)/)[1];
+                mtime = Math.ceil(parseInt(training_time)/2);
+                if (mobilize)
+                {
+                    train_el.innerHTML = train_el.innerHTML.replace(/\(([0-9]+) days\)/, '(<span style="color:red;">' + mtime.toString() + '</span>/$1 days)');
+                }
+                else
+                {
+                    train_el.innerHTML = train_el.innerHTML + '<br>(<span style="color:red;">' + mtime.toString() + '</span> mobilized)';
+                }
+            }
+        }
+    }
 
     if (url.indexOf('build.asp') != -1)
     {
@@ -478,10 +510,22 @@ $(document).ready(function ()
         var total_jobs = parseInt(productivity_info.find('td:eq(1) span').attr('title').replace(/[^0-9]+/g, ''));
         var total_job_buildings = total_jobs/5;
         var productivity_title = productivity_info.find('td:eq(2) span').attr('title');
-        var productivity_change = ['down', 'stable', 'up'].indexOf(productivity_title) - 1;
-        var total_jobs_missing = 0;
-        if (productivity_change == -1)
-            total_jobs_missing = parseInt(productivity_title.replace(/[^0-9]+/g, ''));
+        var productivity_change = '';
+        if (productivity_title.indexOf('down') > -1)
+        {
+            productivity_change = -1;
+        }
+        else if (productivity_title.indexOf('stable') > -1)
+        {
+            productivity_change = 0;
+        }
+        else if (productivity_title.indexOf('up') > -1)
+        {
+            productivity_change = 1;
+        }
+        var resource_jobs_unfilled = 0;
+        resource_jobs_unfilled = productivity_title.replace(/[^0-9]+/g, '');
+        resource_jobs_unfilled = (resource_jobs_unfilled == '') ? 0 : parseInt(resource_jobs_unfilled);
         
         var buildings_info = $('body script:eq(1)').get(0).innerHTML.replace(/<!--/g, '').replace(/-->/g, '');
         eval(buildings_info); //replace this with some form of window[var_name] = var_value;
@@ -508,7 +552,7 @@ $(document).ready(function ()
         cityID - city number used for all the popout windows
         cityName - city name...
         */
-        var resource_buildings = b2 + b3 + b7;
+        var total_resource_buildings = b2 + b3 + b7;
         var total_buildings = b1 + b2 + b3 + b4 + b5 + b6 + b7 + b8 + b9;
         var total_buildings_in_construction = b1i + b2i + b3i + b4i + b5i + b6i + b7i + b8i + b9i;
         var total_job_buildings = total_buildings - b1;
@@ -520,11 +564,13 @@ $(document).ready(function ()
         
         var resources_names = ['g_gold', 'g_food', 'g_stone', 'g_tree', 'g_slaves'];
         $.each(resources_names, function(i) {
-            //alert('var ' + resources_names[i] + ' = ' + resources_info[i] + ';');
             window[resources_names[i]] = parseInt(resources_info[i]);
         });
         
-        var text_info = $('#infotext').get(0).innerHTML.replace(/[^0-9 ]+/g, '').replace(/[ ]+/g, ' ').trim().split(' ');
+        var text_info = $('#infotext');
+        text_info = text_info.clone();
+        text_info.find('ul').remove();
+        text_info = text_info.get(0).innerHTML.replace(/[^0-9 ]+/g, '').replace(/[ ]+/g, ' ').trim().split(' ');
         if (text_info.length == 9) //build info with all peasants employed
         {
             text_info.splice(1, 0, '0');
@@ -533,24 +579,6 @@ $(document).ready(function ()
         {
             
         }
-        else if (text_info.length == 13) //build info with all peasants employed + building a building without slaves
-        {
-            text_info.splice(0, 4);
-            text_info.splice(1, 0, '0');
-        }
-        else if (text_info.length == 14) //build info with some peasants unemployed + building a building without slaves
-        {
-            text_info.splice(0, 4);
-        }
-        else if (text_info.length == 15) //build info with all peasants employed + building with slaves
-        {
-            text_info.splice(0, 6);
-            text_info.splice(1, 0, '0');
-        }
-        else if (text_info.length == 16) //build info with some peasants unemployed + building with slaves
-        {
-            text_info.splice(0, 6);
-        }
         else
         {
             alert('build window number mismatch, data array length (is not 10): ' + (text_info.length).toString() + ' array: ' + text_info.join(', '));
@@ -558,25 +586,40 @@ $(document).ready(function ()
 
         var info_names = ['c_peasants', 'c_peasants_unemployed', 'c_build_space_left', 'c_num_buildable', 'c_num_buildable_walls', 'c_build_cost_gold', 'c_build_cost_tree', 'c_build_cost_stone', 'c_build_cost_stone_wall', 'c_build_time'];
         $.each(info_names, function(i) {
-            //alert('var ' + info_names[i] + ' = ' + text_info[i] + ';');
             window[info_names[i]] = parseInt(text_info[i]);
         });
         
-        //var c_slave_build_time = Math.floor(c_build_time/2);
+        var slaves_used = parseInt($('table:eq(1) tr:eq(1)').text().replace(/[^0-9]+/g, ''));
+        var slaves_building = parseInt($('table:eq(1) tr:eq(2)').text().replace(/[^0-9]+/g, ''));
         
-        if (total_jobs_missing == 0)
+        //var c_slave_build_time = Math.ceil(c_build_time/2);
+
+        var total_jobs = total_job_buildings*5;
+        var resource_jobs = total_resource_buildings*5;
+        
+        var total_jobs_unfilled = 0;
+        total_jobs_unfilled = total_jobs - (c_peasants + slaves_used);
+        if (total_jobs_unfilled < 0)
+            total_jobs_unfilled = 0;
+
+        if (resource_jobs_unfilled == 0)
         {
-            //situation where slaves keep up the productivity, but peasants are needed to fill jobs; can be rising, falling or stable productivity; 
-            //OR
-            //got more or equal number of peasants compared to jobs, so it's really == 0
+            resource_jobs_unfilled = resource_jobs - (c_peasants + slaves_used);
+            if (resource_jobs_unfilled < 0)
+                resource_jobs_unfilled = 0;
         }
         
-        var total_job_buildings_missing = total_jobs_missing/5;
+        
+        
         
         var max_buildings_capacity = total_buildings + c_build_space_left;
         
-        var slaves_building = 0;
         var slaves_working = 0;
+        var slaves_unused = 0;
+        
+      
+        
+        
         //formula for max buildings buildable ==> (c_num_buildable+total_buildings_in_construction)/total_buildings ~= 2.04
      
         
@@ -597,7 +640,7 @@ $(document).ready(function ()
             //alert('Can build all.\nBuildable: ' + c_num_buildable.toString() + ', Total Buildings: ' + total_buildings.toString() + ', Total Capacity: ' + max_buildings_capacity.toString() + '\n' + (Math.round(parseFloat(100*(c_num_buildable+total_buildings_in_construction)/total_buildings) * 100) / 100).toString() + '% buildable/buildings.\n' + (Math.round(parseFloat(100*c_num_buildable/max_buildings_capacity) * 100) / 100).toString() + '% buildable/max_capacity.');
         }*/
         
-
+        
         
         //building tree/stone cost = gold cost/4 = wall stone cost/8
         //1 slave works as 1 peasant, but doesn't pay taxes and doesn't spend food
@@ -635,10 +678,43 @@ $(document).ready(function ()
 // market - allow inserting , and . as thousands separators
 // in training window, add max button, and costs next to input boxes
 // in kingdom window, maybe make the forum link open the forum inside the window, not in a new tab; same when the kd button is flashing in the menu
+// science window: add explanation what each one does, and how much %. add commas to the resources listed at the top of the page
+// science window: add a confirmation dialog when clicking the button.
+// science window: add the amount of missing resources
+// science window: add estimated cost of all sciences, when you hover over one, if you would upgrade it.
+// build window: add 1:5 button next to the 3 production buildings, and a max button next to all
+// add option to always auto-use slaves to build if available, store as variable (if option turned on, and no or not enough  slaves globally and/or locally, add a confirmation/info window where you can cancel the build)
+// build window: always show: homes, 3 productions, walls and any other building that passes 10%
+// build window: add train shortcut
+// train window: add build shortcut
+// prompts on various things: http://visual-utopia.com/forum.asp?f=Suggestions+and+Improvements&t=YESNO%20prompt%20on%20mobile&page=1
+// on kd page kd list: hide 0% kds. hide worlds other than your own. add checkboxes to show/hide both. world could be detectable from the function scrollToFlag(world, x, y):
+//      frame = window.opener.parent.map
+//      else frame = parent.parent.map
+// when changing the city/army from a dropdown box in a window, change it in the global menu, and vice-versa
+// add build, train and defense buttons on the build/train/defense windows of city pages
+// similar links as ^above for armies
+// army window: lots of useful info in the script at the bottom
+// training window: in the training timeline table, hide 0s, center numbers and time headers, right align unit names, fix light/dark rows/columns with overlapping opacities?
+// training: title explaining mobilization and mouse pointer when you hover over (xx mobilized) and (xx/yy days)
+// training: add unit abilites descriptions; ranged troops can defend vs catapults; last tier unit specialty; gaia; nazguls; mages;
+// training: add base training times for comparison (with no milisci, arms or mobilization; don't forget to count in base orc bonus):
+/*
+training time(tier) = ceil((base(tier)+milisci)*orc*arms*mobilize)
+
+tier = [0, 1, 2, 3, 4]
+base = [30, 40, 50, 60, 72]
+milisci = 0, 1, 2, 3,...
+orc = 1/2
+arms = between 1 and 1/2
+mobilize = 1/2 (optional for humans, for randomly about 4% training losses)
+*/
+// replies: http://visual-utopia.com/forum.asp?f=Childrens%20Playground&t=AdviceFAQ&replies=68#reply_post, goes to page 2, 19th post is the reply, does not scroll when opening
 
 
-//SOLVED: forum rul replies: check if reply_number is mod50, so indicates the last page, or can be on previous pages as well; since &replies= doesn't redirect to other pages, I guess it's so
 
+//SEEMS NOT! //SOLVED: forum rul replies: check if reply_number is mod50, so indicates the last page, or can be on previous pages as well; since &replies= doesn't redirect to other pages, I guess it's so
+//DONE: training: maybe: change train time shown when mobilization is on - make it (red mobilize time/(normal color nonmobilze time)
 
 //https://static.visual-utopia.com/menu.js
 //https://static.visual-utopia.com/pop.js
