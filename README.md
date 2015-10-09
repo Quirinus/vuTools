@@ -5,6 +5,8 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - army size indicators, movement direction arrow and army path are white now
 - all armies have **[race]short_player_name** under them now
 - all cities have **[race]city_name**, and then under it **short_player_name**
+- your city names are green, other cities are lightgray
+- all city names have an an outline around them
 
 ######Build window:
 - added Tax% to the top, mouseover to see numbers
