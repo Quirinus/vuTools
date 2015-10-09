@@ -42,185 +42,19 @@ $(document).ready(function ()
         var army_name = '';
         var army_ruler_name = '';
         var army_size = '';
-        var army_size_img = '';
         var army_race = '';
         var army_kd = '';
-        var army_style = '';
         var army_margin = '';
+        var army_left = '';
+        var army_top = '';
+        var army_name_span = '';
+        var army_name_width = '';
         //var army_sizes = ['O Scout (1-5)', 'OO Section (8-12)', 'OOO Platoon (20-50)', 'I Company (100-300)', 'II Battalion (500-1500)', 'III Regiment (2000-4000)', 'X Brigade (Around 5000)',  'XX Division (10,000-20,000)', 'XXX Corps (Around 50,000)', 'XXXX Army (100,000-200,000)', 'XXXXX Group of armies (200,000-1,000,000)?', 'XXXXX Horde More then one million soldiers.?'];
-
-        /*
-        http://visual-utopia.com/forum.asp?f=Guides+and+Articles&t=Attacking&page=1
-        The army size is shown on the map. Level 3 troops (knights, riders, etc) and special units counts as two soldiers. <------
-
-        Scout = 1-7 soldiers
-        Section = 8-11 soldiers
-        Platoon = 12-50 soldiers
-        Company = 51-299 soldiers
-        Battalion = 300-1499 soldiers
-        Regiment = 1500-3999 soldiers
-        Brigade = 4000-9999 soldiers
-        Division = 10,000-19,999 soldiers
-        Corps = 20,000-89,999 soldiers
-        Army = 90,000-199,999 soldiers
-        Group of armies = 200,000-999,999 soldiers or a merge
-        Horde = More then one million soldiers.
-        */
         
-        /*
-        Military science descriptions:
-        lv0 - Sticks and Leather armor
-        lv1 - Tree weapons and weak armor
-        lv2 - Steel weapons and armor
-        lv3 - Steel weapons and strong armor
-        lv4 - Enhanced weapons and handmade dwarven armor
-        >=lv5 - Magic weapons and mithril armor
-        */
-        
-        /*        
-		OP    DP    OP/DP   % Success Chance
-		1     99    0.01    0%
-		2     98    0.02    0%
-		3     97    0.03    0%
-		4     96    0.04    0%
-		5     95    0.05    0%
-		6     94    0.06    0%
-		7     93    0.08    0%
-		8     92    0.09    0%
-		9     91    0.1     0%
-		10    90    0.11    0%
-		11    89    0.12    0%
-		12    88    0.14    0%
-		13    87    0.15    0%
-		14    86    0.16    0%
-		15    85    0.18    0%
-		16    84    0.19    0%
-		17    83    0.2     0%
-		18    82    0.22    0%
-		19    81    0.23    0%
-		20    80    0.25    0%
-		21    79    0.27    0%
-		22    78    0.28    0%
-		23    77    0.3     0%
-		24    76    0.32    0%
-		25    75    0.33    0%
-		26    74    0.35    1%
-		27    73    0.37    1%
-		28    72    0.39    1%
-		29    71    0.41    1%
-		30    70    0.43    1%
-		31    69    0.45    2%
-		32    68    0.47    2%
-		33    67    0.49    3%
-		34    66    0.52    4%
-		35    65    0.54    4%
-		36    64    0.56    5%
-		37    63    0.59    7%
-		38    62    0.61    8%
-		39    61    0.64    10%
-		40    60    0.67    12%
-		41    59    0.69    14%
-		42    58    0.72    17%
-		43    57    0.75    20%
-		44    56    0.79    23%
-		45    55    0.82    27%
-		46    54    0.85    31%
-		47    53    0.89    35%
-		48    52    0.92    40%
-		49    51    0.96    45%
-		50    50    1       50%
-		51    49    1.04    55%
-		52    48    1.08    60%
-		53    47    1.13    65%
-		54    46    1.17    69%
-		55    45    1.22    73%
-		56    44    1.27    77%
-		57    43    1.33    80%
-		58    42    1.38    83%
-		59    41    1.44    86%
-		60    40    1.5     88%
-		61    39    1.56    90%
-		62    38    1.63    92%
-		63    37    1.7     93%
-		64    36    1.78    95%
-		65    35    1.86    96%
-		66    34    1.94    96%
-		67    33    2.03    97%
-		68    32    2.13    98%
-		69    31    2.23    98%
-		70    30    2.33    99%
-		71    29    2.45    99%
-		72    28    2.57    99%
-		73    27    2.7     99%
-		74    26    2.85    99%
-		75    25    3       100%
-		76    24    3.17    100%
-		77    23    3.35    100%
-		78    22    3.55    100%
-		79    21    3.76    100%
-		80    20    4       100%
-		81    19    4.26    100%
-		82    18    4.56    100%
-		83    17    4.88    100%
-		84    16    5.25    100%
-		85    15    5.67    100%
-		86    14    6.14    100%
-		87    13    6.69    100%
-		88    12    7.33    100%
-		89    11    8.09    100%
-		90    10    9       100%
-		91    9    10.11    100%
-		92    8    11.5     100%
-		93    7    13.29    100%
-		94    6    15.67    100%
-		95    5    19       100%
-		96    4    24       100%
-		97    3    32.33    100%
-		98    2    49       100%
-		99    1    99       100%
-        
-        approx formula:
-        
-        General model:
-		  f(x) = 100/(exp((a-x)/b)+c)
-		Coefficients (with 95% confidence bounds):
-		  a =       1.013  (1.003, 1.022)
-		  b =      0.1817  (0.1734, 0.1899)
-		  c =       1.025  (1.015, 1.035)
-
-		Goodness of fit:
-		  SSE: 253.7
-		  R-square: 0.9976
-		  Adjusted R-square: 0.9975
-		  RMSE: 2.074
-  
-  
-		f(x) = 100/(exp((1.013-x)/0.1817)+1.025)
-        
-		*/
-        
-        /*
-        http://visual-utopia.com/forum.asp?f=Guides+and+Articles&t=The%20Units%20Guide&page=1
-        prep time formula?:
-        take % chance
-        look at corresponding op/dp quotient 
-        divide by current prep time 
-        multiply by total prep time 
-        take product 
-        look at corresponding % chance
-        */
-        
-        //find total prep time formula. maybe involves: number of units on your side or op, building size of the city, number of walls (find out the % they increase). might also invovle number of enemy units or dp
-        //find how % success changes with prep time, for attacks and for siege
-        
-        //merging an army to a prepping army halves the already prepped time (probably floored); I think it doesn't depend on the size of the merger vs mergee
-        
-        //unit gold upkeep = Number of troops * 2,74 ?
-        //human sped up training gives ~4% less troops in total
-        //1 xp = random 1-2% bonus op/dp, roughly 1.5%
-        //% morale ~= % op/dp
-
-        
+        //armies
+        $('div[style*="arrow"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)'); //css('z-index', '2'); // and add image map with coordinates from img, rotated for each
+        $('img[src*="armysize"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)').css('z-index', '2');
+        $('img[src*="reddot"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)');
         
         for (i = 0; i < army_len; i++)
         {
@@ -236,7 +70,6 @@ $(document).ready(function ()
             army_size = title.substring(title.indexOf(army_race) + army_race.length, name_separator_pos4);
             army_ruler_name = title.substring(name_separator_pos4 + ' controlled by '.length, name_separator_pos4 + ' controlled by '.length + name_separator_pos5);
             army_kd = title.substring(title.indexOf(army_ruler_name) + army_ruler_name.length + ' of '.length);
-            army_style = $(armies[i]).attr('style');
 
             for (j = 0; j < titles_len; j++)
             {
@@ -255,8 +88,6 @@ $(document).ready(function ()
                     army_ruler_name = army_ruler_name.substring(0, 9);
             }
 
-
-
             army_race = '[' + army_race.substr(0,2) + ']';
 
             if ($(armies[i]).hasClass('attackingarmy') || $(armies[i]).hasClass('frozen'))
@@ -268,17 +99,34 @@ $(document).ready(function ()
                 army_margin = '1em';
             }
 
-            army_style = army_style.replace('border: 1px solid #000000;','');
-
-            $('div[style*="arrow"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)'); //css('z-index', '2'); // and add image map with coordinates from img, rotated for each
-            $('img[src*="armysize"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)').css('z-index', '2');
-            $('img[src*="reddot"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)');
-
-            $(armies[i]).before('<span style="' + army_style + 'cursor: default; color: white; font-weight: bold; font-size:0.8em; z-index: 10; text-align:center; text-shadow: black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px; -webkit-font-smoothing: antialiased; margin-top: ' + army_margin + ';">' + army_race + army_ruler_name +'</span>');
+            army_left = parseInt($(armies[i]).css('left')); //.replace('px','') not needed if using parseInt
+            army_top = parseInt($(armies[i]).css('top'));
+           
+            army_name_span = $('<span></span>')
+            .text(army_race + army_ruler_name)
+            .css({
+                'position' : 'absolute',
+                'top' : army_top,
+                'left' : army_left,
+                'margin-top' : army_margin,
+                'cursor' : 'default',
+                'color' : 'white',
+                'font-weight' : 'bold',
+                'font-size' : '0.8em',
+                'z-index' : '10',
+                'text-align' : 'center',
+                'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
+                '-webkit-font-smoothing' : 'antialiased'
+            });
+            
+            
+            $(armies[i]).after(army_name_span);
+            army_name_width = parseInt(army_name_span.width());
+            army_name_span.css('left', army_left - Math.floor((army_name_width-18)/2)); //18 = $(armies[i]).width();
 
             //add army size name and numbers to title
 
-            //<img class="armyclick" onclick="pop('armyInfoE.asp?armyID=1536025')" title="Kill Him: Human scout controlled by Mr. Hero The Squire of The Collective" width="18" height="15" src="http://visual-utopia.com/KDbanners/kingdom5753.jpg" style="position: absolute; top: 4526; left:4069; border: 1px solid #000000;">
+            
         }
 
 
@@ -287,36 +135,43 @@ $(document).ready(function ()
         {
             title = $(citynames[i]).attr('title');
             city_name = citynames[i].innerHTML;
+
+            name_separator_pos1 = title.indexOf(' city owned by ');
+            name_separator_pos2 = title.lastIndexOf(' of ');
+            name_separator_pos3 = title.indexOf(': ');
+            race = title.substring(0, name_separator_pos1);
+            race = '[' + race.substr(0,2) + ']';
+            ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos2);
+            for (j = 0; j < titles_len; j++)
+            {
+                if (ruler_name.indexOf(titles_trim[j]) == 0)
+                {
+                    ruler_name = ruler_name.slice(titles_trim[j].length);
+                    break;
+                }
+            }
+            if (ruler_name.length > 10)
+            {
+                ruler_name_space_pos = ruler_name.indexOf(' ');
+                if (ruler_name_space_pos != -1)
+                    ruler_name = ruler_name.substring(0, ruler_name_space_pos);
+                if (ruler_name.length > 10)
+                    ruler_name = ruler_name.substring(0, 9);
+            }
+            kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3); //needs regex in case kd name has ' of ' in it;
+            //citynames[i].innerHTML = race + city_name;
+            ruler_name_style = $(citynames[i]).attr('style');
+            $(citynames[i]).css('text-shadow', 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px').css('-webkit-font-smoothing', 'antialiased');
             if (title.indexOf('Your city:') !== 0)
             {
-                name_separator_pos1 = title.indexOf(' city owned by ');
-                name_separator_pos2 = title.lastIndexOf(' of ');
-                name_separator_pos3 = title.indexOf(': ');
-                race = title.substring(0, name_separator_pos1);
-                race = '[' + race.substr(0,2) + ']';
-                ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos2);
-                for (j = 0; j < titles_len; j++)
-                {
-                    if (ruler_name.indexOf(titles_trim[j]) == 0)
-                    {
-                        ruler_name = ruler_name.slice(titles_trim[j].length);
-                        break;
-                    }
-                }
-                if (ruler_name.length > 10)
-                {
-                    ruler_name_space_pos = ruler_name.indexOf(' ');
-                    if (ruler_name_space_pos != -1)
-                        ruler_name = ruler_name.substring(0, ruler_name_space_pos);
-                    if (ruler_name.length > 10)
-                        ruler_name = ruler_name.substring(0, 9);
-                }
-                kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3); //needs regex in case kd name has ' of ' in it;
-                citynames[i].innerHTML = race + city_name;
-                ruler_name_style = $(citynames[i]).attr('style');
-                $(citynames[i]).before('<span class="citynames" style="' + ruler_name_style + 'cursor: default; color: white; font-weight: bold; text-decoration: none; font-size:0.8em;' + '"><br><br>' + ruler_name +'</span>');
+                $(citynames[i]).css('color', 'lightgray');
+                $(citynames[i]).before('<span style="' + ruler_name_style + 'text-align: center; width: 100px; height: 20px; cursor: default; color: white; font-weight: bold; text-decoration: none; font-size:0.8em; text-shadow: black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px; -webkit-font-smoothing: antialiased;"><br><br><br>' + race + ruler_name +'</span>');
                 //add city names to title
                 //untagged kds don't have the ' of <kd name>' part, and their name results in race
+            }
+            else
+            {
+                $(citynames[i]).css('color', 'Chartreuse');   
             }
         }
     }
@@ -478,12 +333,11 @@ $(document).ready(function ()
     
     if (url.indexOf('train.asp') != -1)
     {
-        var race = 'human';
-        if (race == 'human') //check by the name of the first unit
+        var human = ($('#infotext').text().indexOf('Catapults') != -1);
+
+        if (human)
         {
-            //<a href="mobilize.asp?cityID=493418" class="button big city" title="Train troops at normal speed">Go back to normal training speed</a>
-            //<a href="mobilize.asp?cityID=493330" class="button big city" title="Troops will be trained double as fast, but we will lose some of them">Mobilize troops</a>
-        
+
             var mobilize = false;
             if ($('a[href^=mobilize]').text().indexOf('Mobilize') == -1)
             {
@@ -731,9 +585,10 @@ $(document).ready(function ()
         //productivity
         var productivity_info = $('table:eq(0) tr:eq(1) td:eq(2)');
         var productivity = parseInt(productivity_info.text());
-        var productivity_percent_real = Math.round((resource_jobs - resource_jobs_unfilled)*100/resource_jobs);
-        var productivity_percent_peasants = Math.round(c_peasants*100/resource_jobs); //can be over 100%
-        var productivity_percent_slaves = Math.round(slaves_used*100/resource_jobs);
+        // fix this to remove the extensions from towns with no resource_jobs, and fix the title
+        var productivity_percent_real = (resource_jobs == 0) ? 100 : Math.round((resource_jobs - resource_jobs_unfilled)*100/resource_jobs);
+        var productivity_percent_peasants = (resource_jobs == 0) ? 0 : Math.round(c_peasants*100/resource_jobs); //can be over 100%
+        var productivity_percent_slaves = (resource_jobs == 0) ? 0 : Math.round(slaves_used*100/resource_jobs);
         productivity_info.html(productivity_info.html() + '/<span title="Productivity due to ' + numberWithCommas(slaves_used + c_peasants) + ' peasants and slaves.">' + productivity_percent_real.toString() + '%</span><br><span style="font-size:small;"><span title="Productivity due to ' + numberWithCommas(c_peasants) + ' peasants.">' +
         productivity_percent_peasants.toString() + '%</span> + <span title="Productivity due to ' + numberWithCommas(slaves_used) + ' slaves.">' + productivity_percent_slaves.toString() + '%</span></span>');
         
@@ -780,6 +635,8 @@ $(document).ready(function ()
 });
     //<div title="Halfling city owned by Mr. Ruthless The Tall of Childrens Playground: 27539 buildings." onclick="pop('cityInfoE.asp?cityID=493328')" style="position: absolute; top:3848; left: 3524;" class="citynames">The PalaceHalfling city owned by Mr. Ruthless The Tall of Childrens Playground: 27539 buildings.</div>
 
+//build page: add number of resource jobs in some of the titles, eg. prod% 
+//build page: remove the extensions from towns with no resource_jobs, and fix the title
 //build page: reconstruct productivity, so the current%/total% is all wrapped up in the span, so all is red, and all has the same title. then the titles includes unfilled jobs (+plus up/down/stable) and peasants + slaves working numbers. and add numberWithCommas to numbers.
 //build page: indicate that productivity depends on resources jobs, not total jobs, filled with peasants and slaves. but tax depends on total jobs filled by peasants.
 //every popup window: add underdotted to every element that has a title
@@ -851,3 +708,175 @@ mobilize = 1/2 (optional for humans, for randomly about 4% training losses)
 //https://static.visual-utopia.com/pngfix.js
 //https://static.visual-utopia.com/build.js
 //https://static.visual-utopia.com/style.css?v=3
+
+
+       /*
+        http://visual-utopia.com/forum.asp?f=Guides+and+Articles&t=Attacking&page=1
+        The army size is shown on the map. Level 3 troops (knights, riders, etc) and special units counts as two soldiers. <------
+
+        Scout = 1-7 soldiers
+        Section = 8-11 soldiers
+        Platoon = 12-50 soldiers
+        Company = 51-299 soldiers
+        Battalion = 300-1499 soldiers
+        Regiment = 1500-3999 soldiers
+        Brigade = 4000-9999 soldiers
+        Division = 10,000-19,999 soldiers
+        Corps = 20,000-89,999 soldiers
+        Army = 90,000-199,999 soldiers
+        Group of armies = 200,000-999,999 soldiers or a merge
+        Horde = More then one million soldiers.
+        */
+        
+        /*
+        Military science descriptions:
+        lv0 - Sticks and Leather armor
+        lv1 - Tree weapons and weak armor
+        lv2 - Steel weapons and armor
+        lv3 - Steel weapons and strong armor
+        lv4 - Enhanced weapons and handmade dwarven armor
+        >=lv5 - Magic weapons and mithril armor
+        */
+        
+        /*        
+		OP    DP    OP/DP   % Success Chance
+		1     99    0.01    0%
+		2     98    0.02    0%
+		3     97    0.03    0%
+		4     96    0.04    0%
+		5     95    0.05    0%
+		6     94    0.06    0%
+		7     93    0.08    0%
+		8     92    0.09    0%
+		9     91    0.1     0%
+		10    90    0.11    0%
+		11    89    0.12    0%
+		12    88    0.14    0%
+		13    87    0.15    0%
+		14    86    0.16    0%
+		15    85    0.18    0%
+		16    84    0.19    0%
+		17    83    0.2     0%
+		18    82    0.22    0%
+		19    81    0.23    0%
+		20    80    0.25    0%
+		21    79    0.27    0%
+		22    78    0.28    0%
+		23    77    0.3     0%
+		24    76    0.32    0%
+		25    75    0.33    0%
+		26    74    0.35    1%
+		27    73    0.37    1%
+		28    72    0.39    1%
+		29    71    0.41    1%
+		30    70    0.43    1%
+		31    69    0.45    2%
+		32    68    0.47    2%
+		33    67    0.49    3%
+		34    66    0.52    4%
+		35    65    0.54    4%
+		36    64    0.56    5%
+		37    63    0.59    7%
+		38    62    0.61    8%
+		39    61    0.64    10%
+		40    60    0.67    12%
+		41    59    0.69    14%
+		42    58    0.72    17%
+		43    57    0.75    20%
+		44    56    0.79    23%
+		45    55    0.82    27%
+		46    54    0.85    31%
+		47    53    0.89    35%
+		48    52    0.92    40%
+		49    51    0.96    45%
+		50    50    1       50%
+		51    49    1.04    55%
+		52    48    1.08    60%
+		53    47    1.13    65%
+		54    46    1.17    69%
+		55    45    1.22    73%
+		56    44    1.27    77%
+		57    43    1.33    80%
+		58    42    1.38    83%
+		59    41    1.44    86%
+		60    40    1.5     88%
+		61    39    1.56    90%
+		62    38    1.63    92%
+		63    37    1.7     93%
+		64    36    1.78    95%
+		65    35    1.86    96%
+		66    34    1.94    96%
+		67    33    2.03    97%
+		68    32    2.13    98%
+		69    31    2.23    98%
+		70    30    2.33    99%
+		71    29    2.45    99%
+		72    28    2.57    99%
+		73    27    2.7     99%
+		74    26    2.85    99%
+		75    25    3       100%
+		76    24    3.17    100%
+		77    23    3.35    100%
+		78    22    3.55    100%
+		79    21    3.76    100%
+		80    20    4       100%
+		81    19    4.26    100%
+		82    18    4.56    100%
+		83    17    4.88    100%
+		84    16    5.25    100%
+		85    15    5.67    100%
+		86    14    6.14    100%
+		87    13    6.69    100%
+		88    12    7.33    100%
+		89    11    8.09    100%
+		90    10    9       100%
+		91    9    10.11    100%
+		92    8    11.5     100%
+		93    7    13.29    100%
+		94    6    15.67    100%
+		95    5    19       100%
+		96    4    24       100%
+		97    3    32.33    100%
+		98    2    49       100%
+		99    1    99       100%
+        
+        approx formula:
+        
+        General model:
+		  f(x) = 100/(exp((a-x)/b)+c)
+		Coefficients (with 95% confidence bounds):
+		  a =       1.013  (1.003, 1.022)
+		  b =      0.1817  (0.1734, 0.1899)
+		  c =       1.025  (1.015, 1.035)
+
+		Goodness of fit:
+		  SSE: 253.7
+		  R-square: 0.9976
+		  Adjusted R-square: 0.9975
+		  RMSE: 2.074
+  
+  
+		f(x) = 100/(exp((1.013-x)/0.1817)+1.025)
+        
+		*/
+        
+        /*
+        http://visual-utopia.com/forum.asp?f=Guides+and+Articles&t=The%20Units%20Guide&page=1
+        prep time formula?:
+        take % chance
+        look at corresponding op/dp quotient 
+        divide by current prep time 
+        multiply by total prep time 
+        take product 
+        look at corresponding % chance
+        */
+        
+        //find total prep time formula. maybe involves: number of units on your side or op, building size of the city, number of walls (find out the % they increase). might also invovle number of enemy units or dp
+        //find how % success changes with prep time, for attacks and for siege
+        
+        //merging an army to a prepping army halves the already prepped time (probably floored); I think it doesn't depend on the size of the merger vs mergee
+        
+        //unit gold upkeep = Number of troops * 2,74 ?
+        //human sped up training gives ~4% less troops in total
+        //1 xp = random 1-2% bonus op/dp, roughly 1.5%
+        //% morale ~= % op/dp
