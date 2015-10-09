@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         VU Tools
-// @version      0.11
+// @version      0.12
 // @author       Ivan Jelenić (Quirinus)
 // @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
 // @homepage     https://github.com/Quirinus/
@@ -357,6 +357,19 @@ $(document).ready(function ()
         
         if ((url.indexOf('#new') == -1) && (url.indexOf('#bottom') != -1))
             navigation.find('a[href="#bottom"]').get(0).click();
+        
+        //modified from https://static.visual-utopia.com/mobile/pop.js
+        $(function () {
+            $('<script>')
+            .attr('type', 'text/javascript')
+            .text('function reply(obj) { var html = obj.parentNode.parentNode.innerHTML; var name = html.substring( html.indexOf("<b>") + 3, html.indexOf("</b>") ); var txt = html.substring( html.indexOf(\'<div class="t">\') + 15, html.indexOf(\'</div><br> <a href="forum.asp?forum=\') ); html = \'<blockquote cite="\' + document.location.href + \'"><b>\' + name +  \':</b>\' + txt  + \'</blockquote><br><br>\'; var iframe = document.getElementsByTagName(\'iframe\')[1]; var doc = iframe.contentWindow.document; doc.body.innerHTML = doc.body.innerHTML + "<br>" + html;}')
+            .appendTo('head');
+        });
+        
+        //if http://visual-utopia.com/mobile/forum.asp?f=Bugs+and+Errors&t=City+losing+morel+for+no+reas#reply
+        //<a href="#reply" onclick="javascript: reply(this);">Quote</a>
+        $('a[href*="reportmessage"]').after(' &nbsp <a href="#reply" onclick="javascript: reply(this);">Quote</a>');
+        
     } //topics in subforum
     else if ((url.indexOf('?f=') != -1) || (url.indexOf('?forum=') != -1))
     {
@@ -503,13 +516,68 @@ $(document).ready(function ()
             }
         }
     }
+    
+    if (url.indexOf('kingdom.asp?list=otherkingdoms') != -1)
+    {
+       
+        $('#main > h1').css('text-align', 'center').text('Kingdom power list');
+        $('#main > a:eq(1)').addClass('button').text('Return to kingdom page');
+        //$('#redirlink').show();
+        $('#main > table:eq(0)').after('<a href="kingdom.asp" class="button">Return to kingdom page</a><br>');
+        $('#main > table:eq(0)').remove();
+        
+        
+        //make the mouse a pointer when hovering over the whole label
+        //http://stackoverflow.com/a/20705524
+        /*
+        $('head').append('<style type="text/css">.hiderow {display: none;}</style>');
+        $('#main > br:eq(0)').after('<label><input type="checkbox" id="onlyNonZeroes" checked> <span>Hide</span> kingdoms with 0% power.</label><br>');
+     
+        
+        $(document).on("change", "#onlyNonZeroes", function () {
+            if ($(this).is(":checked")) {
+                $(this).parent().find('span').text('Hide');
+                $('tr td:eq(4)').each(function (k, element) {  //needs class I think
+                    if ($(element).html() == '0') {
+                        $(element).addClass("hiderow");
+                    }
+                });
+            } else {
+                $(this).parent().find('span').text('Show');
+                $('tr td:eq(4)').removeClass("hiderow"); //needs class I think
+            }
+        });
+        */
+        
+    }
+    else if (url.indexOf('kingdom.asp') != -1)
+    {
+        //moves kd banner under the kd forum button
+        var kd_banner = $('center:eq(0)');
+        //var kd_list_button = $('a').eq(1);
+        //alert(kd_list_button.text());
+        kd_banner = kd_banner.clone();
+        $('#main > table:eq(0)').after(kd_banner);
+        $('#main > table:eq(0)').after('<br>');
+
+        //centers the kd name header
+        $('#main > h1').css('text-align', 'center');
+
+        //makes the forum open up in the same window instead of a new tab
+        $('table:eq(0) a').removeAttr('target');
+
+        //adds a 'List other kingdoms' button under your kd players list
+        var kd_list = $('#main > a:eq(1)').clone();
+        $('#main > br:eq(3)').after(kd_list);
+    }
+    
 
     if (url.indexOf('build.asp') != -1)
     {
-        var productivity_info = $('table:eq(0) tr:eq(1)');
-        var total_jobs = parseInt(productivity_info.find('td:eq(1) span').attr('title').replace(/[^0-9]+/g, ''));
+        var build_info = $('table:eq(0) tr:eq(1)');
+        var total_jobs = parseInt(build_info.find('td:eq(1) span').attr('title').replace(/[^0-9]+/g, ''));
         var total_job_buildings = total_jobs/5;
-        var productivity_title = productivity_info.find('td:eq(2) span').attr('title');
+        var productivity_title = build_info.find('td:eq(2) span').attr('title');
         var productivity_change = '';
         if (productivity_title.indexOf('down') > -1)
         {
@@ -527,7 +595,7 @@ $(document).ready(function ()
         resource_jobs_unfilled = productivity_title.replace(/[^0-9]+/g, '');
         resource_jobs_unfilled = (resource_jobs_unfilled == '') ? 0 : parseInt(resource_jobs_unfilled);
         
-        var buildings_info = $('body script:eq(1)').get(0).innerHTML.replace(/<!--/g, '').replace(/-->/g, '');
+        var buildings_info = $('script:eq(1)').get(0).innerHTML.replace(/<!--/g, '').replace(/-->/g, '');
         eval(buildings_info); //replace this with some form of window[var_name] = var_value;
         /*
         b0 - Wreckages
@@ -557,7 +625,7 @@ $(document).ready(function ()
         var total_buildings_in_construction = b1i + b2i + b3i + b4i + b5i + b6i + b7i + b8i + b9i;
         var total_job_buildings = total_buildings - b1;
         
-        var resources_info = $('body script:eq(4)').get(0).innerHTML;
+        var resources_info = $('script:eq(4)').get(0).innerHTML;
         resources_info = resources_info.replace(/[^0-9&]/g, '');
         resources_info = resources_info.split("&");
         resources_info.pop();
@@ -589,8 +657,14 @@ $(document).ready(function ()
             window[info_names[i]] = parseInt(text_info[i]);
         });
         
-        var slaves_used = parseInt($('table:eq(1) tr:eq(1)').text().replace(/[^0-9]+/g, ''));
-        var slaves_building = parseInt($('table:eq(1) tr:eq(2)').text().replace(/[^0-9]+/g, ''));
+        
+        var slaves_used = 0;
+        var slaves_building = 0;
+        if ($('table').size() > 14) //if you don't have global slaves, this table is not there, so add a check for that table; if there's slaves asigned to the city, it will be there though
+        {
+            slaves_used = parseInt($('table:eq(1) tr:eq(1)').text().replace(/[^0-9]+/g, ''));
+            slaves_building = parseInt($('table:eq(1) tr:eq(2)').text().replace(/[^0-9]+/g, ''));
+        }
         
         //var c_slave_build_time = Math.ceil(c_build_time/2);
 
@@ -609,15 +683,65 @@ $(document).ready(function ()
                 resource_jobs_unfilled = 0;
         }
         
+        var tax_jobs_unfilled = total_jobs - c_peasants;
+        if (tax_jobs_unfilled/total_jobs < 0)
+            tax_jobs_unfilled = 0;
         
+        /*var resource_jobs_unfilled_peasants = resource_jobs - c_peasants;
+        if (resource_jobs_unfilled_peasants/resource_jobs < 0)
+            resource_jobs_unfilled_peasants = 0;*/
+     
         
-        
+        var job_buildings_missing = Math.ceil(c_peasants_unemployed/5);
+
         var max_buildings_capacity = total_buildings + c_build_space_left;
         
         var slaves_working = 0;
         var slaves_unused = 0;
         
-      
+        /*
+        var pop_percent_peasants = Math.floor(c_peasants*100/(b1*25));
+        var pop_missing_peasants = b1*25 - c_peasants;
+        var pop_percent_total = parseInt($('#b1 tr:eq(5) td:eq(1)').replace(/[^0-9]+/g, ''));
+        var pop_percent_army = 100 - pop_percent_total - pop_percent_peasants;
+        $('table:eq(0) tr:eq(0) th:eq(2)').after('<th>Pop.</th>');
+        if (pop_percent_total != pop_percent_peasants)
+        {
+            $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big"><span title="Percent of houses filled by peasants.">' + pop_percent_peasants.toString() + '%</span><br><span title="Percent of houses filled by army.">' + pop_percent_army.toString() + '</span></td>');
+        }
+        else
+        {
+            $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big" title="Percent of houses filled by peasants.">' + pop_percent_peasants.toString() + '%</td>');
+        }
+        */
+            
+        var tax_percent = Math.floor(c_peasants*100/total_jobs); //Math.floor((total_jobs - tax_jobs_unfilled)*100/total_jobs)';
+        $('table:eq(0) tr:eq(0) th:eq(2)').after('<th>Tax</th>');
+        if (tax_percent > 100)
+        {
+            tax_percent = 100;
+            $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big" title="' + numberWithCommas(c_peasants_unemployed) + ' peasants are unemployed and not paying tax.\nBuild ' + numberWithCommas(job_buildings_missing) + ' more non-house buildings to generate jobs, train them to military, or move them to where there is jobs available." style="color: red">' + tax_percent.toString() + '%</td>');
+        }
+        else
+        {
+            $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big" title="There are jobs not filled by peasants.\nGet ' + numberWithCommas(tax_jobs_unfilled) + ' more peasants to generate maximum tax.">' + tax_percent.toString() + '%</td>');
+        }
+        
+        
+        //productivity
+        var productivity_info = $('table:eq(0) tr:eq(1) td:eq(2)');
+        var productivity = parseInt(productivity_info.text());
+        var productivity_percent_real = Math.round((resource_jobs - resource_jobs_unfilled)*100/resource_jobs);
+        var productivity_percent_peasants = Math.round(c_peasants*100/resource_jobs); //can be over 100%
+        var productivity_percent_slaves = Math.round(slaves_used*100/resource_jobs);
+        productivity_info.html(productivity_info.html() + '/<span title="Productivity due to ' + numberWithCommas(slaves_used + c_peasants) + ' peasants and slaves.">' + productivity_percent_real.toString() + '%</span><br><span style="font-size:small;"><span title="Productivity due to ' + numberWithCommas(c_peasants) + ' peasants.">' +
+        productivity_percent_peasants.toString() + '%</span> + <span title="Productivity due to ' + numberWithCommas(slaves_used) + ' slaves.">' + productivity_percent_slaves.toString() + '%</span></span>');
+        
+        
+        
+        
+        //$('#infotext').get(0).innerHTML = numberWithCommas($('#infotext').get(0).innerHTML);
+        
         
         
         //formula for max buildings buildable ==> (c_num_buildable+total_buildings_in_construction)/total_buildings ~= 2.04
@@ -656,17 +780,18 @@ $(document).ready(function ()
 });
     //<div title="Halfling city owned by Mr. Ruthless The Tall of Childrens Playground: 27539 buildings." onclick="pop('cityInfoE.asp?cityID=493328')" style="position: absolute; top:3848; left: 3524;" class="citynames">The PalaceHalfling city owned by Mr. Ruthless The Tall of Childrens Playground: 27539 buildings.</div>
 
-
-//turn on land size, productivity, employement, morale and maybe defense in production
+//build page: reconstruct productivity, so the current%/total% is all wrapped up in the span, so all is red, and all has the same title. then the titles includes unfilled jobs (+plus up/down/stable) and peasants + slaves working numbers. and add numberWithCommas to numbers.
+//build page: indicate that productivity depends on resources jobs, not total jobs, filled with peasants and slaves. but tax depends on total jobs filled by peasants.
+//every popup window: add underdotted to every element that has a title
+// replace .replace(/[^0-9]+/g, '') with a new method called .stripNonNum(optional delimiter), where if delimiter != undefined then get all numbers and return them as a delimited string
+//map: add city name to title
 //hide/remove some waypoints (from kd page list and from map)
 //add extra X or some other sign like for armies of the last size, or two rows, one with 3X and the other with 2X
-//in production window, separate total tax and total gold from mines, then show them combined under it
 //wut, opens when you click on the KD button: http://visual-utopia.com/forum.asp?f=Childrens%20Playground&t=Battle%20Reports&replies=42
 //when you reply it scrolls to the top of the page... make it scroll to the bottom
 // in production window, calculate the max amount of walls, and use the current amount to show %walls (or %increased prep time)
 // in production window, add col for training, new army, and add links to defense in the empty defense cells
 // fix right borders in production window
-// split tax and mine gold income
 // in production window, from Prod.	Pop.	Empl. and land, calculate the approx number of jobs and home and workers (pezzie+slave) and other buildings
 // in production window, rename Total Income to Net Income and Gold Income to Total Income
 // in production window, move land col to the first place after city names, remove light color from it, recolor the rest of the table with alternate colors, make the 4 tds of the gold total rows at the bot have colspan="2"
@@ -678,6 +803,7 @@ $(document).ready(function ()
 // market - allow inserting , and . as thousands separators
 // in training window, add max button, and costs next to input boxes
 // in kingdom window, maybe make the forum link open the forum inside the window, not in a new tab; same when the kd button is flashing in the menu
+// kd list window: hide kds that have 0%. some code is already included and commented out in this script
 // science window: add explanation what each one does, and how much %. add commas to the resources listed at the top of the page
 // science window: add a confirmation dialog when clicking the button.
 // science window: add the amount of missing resources
@@ -695,6 +821,7 @@ $(document).ready(function ()
 // add build, train and defense buttons on the build/train/defense windows of city pages
 // similar links as ^above for armies
 // army window: lots of useful info in the script at the bottom
+// production window: add check for red productivity % text
 // training window: in the training timeline table, hide 0s, center numbers and time headers, right align unit names, fix light/dark rows/columns with overlapping opacities?
 // training: title explaining mobilization and mouse pointer when you hover over (xx mobilized) and (xx/yy days)
 // training: add unit abilites descriptions; ranged troops can defend vs catapults; last tier unit specialty; gaia; nazguls; mages;
@@ -715,6 +842,9 @@ mobilize = 1/2 (optional for humans, for randomly about 4% training losses)
 
 //SEEMS NOT! //SOLVED: forum rul replies: check if reply_number is mod50, so indicates the last page, or can be on previous pages as well; since &replies= doesn't redirect to other pages, I guess it's so
 //DONE: training: maybe: change train time shown when mobilization is on - make it (red mobilize time/(normal color nonmobilze time)
+//DONE: turn on land size, productivity, employement, morale and maybe defense in production
+//DONE: in production window, separate total tax and total gold from mines, then show them combined under it
+//DONE: split tax and mine gold income
 
 //https://static.visual-utopia.com/menu.js
 //https://static.visual-utopia.com/pop.js
