@@ -24,6 +24,7 @@ $(document).ready(function ()
         var city_len = citynames.length;
         var title = '';
         var city_name = '';
+        var city_name_span = '';
         var race = '';
         var ruler_name = '';
         var ruler_name_space_pos = -1;
@@ -36,6 +37,20 @@ $(document).ready(function ()
         var name_separator_pos5 = -1;
         var titles_trim = ['Mr. ', 'Sir ' , 'Lord ', 'Duke ' , 'Prince ', 'Ms. ', 'Lady ', 'Duchess ', 'Princess '];
         var titles_len = titles_trim.length;
+        
+        var kd_own = ['Childrens Playground'];
+        var kds_friendly = ['The Jester Empire'];
+        //var kds_neutral = ['', 'The Native People', '*No Kingdom*', 'Mad and Dangerous', 'The Visual Utopia Empire'];
+        var kds_enemy = ['The Collective', 'Zeon'];
+        //var kds_relations = [kd_own, kds_friendly, kds_enemy];
+        var color_own = '#B679F0'; //plum, lightgray, thistle, #B9F2FF, #B679F0
+        var color_ownkd = 'chartreuse'; //lime, chartreuse, lightgray
+        var color_friendly = 'lightgray'; //#9DE0BA, #99FF99, lime
+        var color_neutral = 'gold'; //yellow, darkkhaki
+        var color_enemy = '#FF716E'; //crimson, tomato
+        //var colors_relations = [color_ownkd, color_friendly, color_enemy];
+        
+        var kd_found = false;
 
         var armies = $.makeArray($('.armyclick'));
         var army_len = armies.length;
@@ -49,28 +64,69 @@ $(document).ready(function ()
         var army_top = '';
         var army_name_span = '';
         var army_name_width = '';
+        var army_color = '';
         //var army_sizes = ['O Scout (1-5)', 'OO Section (8-12)', 'OOO Platoon (20-50)', 'I Company (100-300)', 'II Battalion (500-1500)', 'III Regiment (2000-4000)', 'X Brigade (Around 5000)',  'XX Division (10,000-20,000)', 'XXX Corps (Around 50,000)', 'XXXX Army (100,000-200,000)', 'XXXXX Group of armies (200,000-1,000,000)?', 'XXXXX Horde More then one million soldiers.?'];
         
-        //armies
+        //here you can access variables under $('script:eq(2)), since they're already loaded
+        
+        
+        
+        //armies strArmies 
         $('div[style*="arrow"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)'); //css('z-index', '2'); // and add image map with coordinates from img, rotated for each
         $('img[src*="armysize"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)').css('z-index', '2');
         $('img[src*="reddot"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)');
         
         for (i = 0; i < army_len; i++)
         {
+            //People of Adolf Eichmann: Dwarf platoon controlled by Mr. Adolf Eichmann
+            //Iamabazturd: Troll corps controlled by Mr. Todd L Fondler of Childrens Playground
+            //Army of the Dead: Elf company controlled by Sir Zeons Fess Leader
+            
             title = $(armies[i]).attr('title');
             name_separator_pos1 = title.indexOf(': ');
             name_separator_pos2 = title.substring(name_separator_pos1 + ': '.length).indexOf(' ');
             name_separator_pos3 = title.substring(name_separator_pos2  + ' '.length).indexOf(' ');
             name_separator_pos4 = title.indexOf(' controlled by ');
-            name_separator_pos5 = title.substring(name_separator_pos4 + ' controlled by '.length).indexOf(' of '); //needs regex in case kd name has ' of ' in it
+            //needs regex in case user name has ' of ' in it V (kd name can have of in it too)
+            name_separator_pos5 = title.substring(name_separator_pos4 + ' controlled by '.length).indexOf(' of ');
 
             army_name = title.substring(0, name_separator_pos1);
             army_race = title.substring(name_separator_pos1 + ': '.length, name_separator_pos1 + ': '.length + name_separator_pos2);
             army_size = title.substring(title.indexOf(army_race) + army_race.length, name_separator_pos4);
-            army_ruler_name = title.substring(name_separator_pos4 + ' controlled by '.length, name_separator_pos4 + ' controlled by '.length + name_separator_pos5);
-            army_kd = title.substring(title.indexOf(army_ruler_name) + army_ruler_name.length + ' of '.length);
 
+            if (name_separator_pos5 != -1)
+            {
+                army_ruler_name = title.substring(name_separator_pos4 + ' controlled by '.length, name_separator_pos4 + ' controlled by '.length + name_separator_pos5);
+                army_kd = title.substring(title.indexOf(army_ruler_name) + army_ruler_name.length + ' of '.length);
+            }
+            else
+            {
+                army_ruler_name = title.substring(name_separator_pos4 + ' controlled by '.length);
+                army_kd = '';
+            }
+            
+
+            if (army_ruler_name == strRulerName)
+            {
+                army_color = color_own;
+            }            
+            else if (army_kd == kd_own[0])
+            {
+                army_color = color_ownkd;
+            }
+            else if (kds_friendly.indexOf(army_kd) != -1)
+            {
+                army_color = color_friendly;
+            }
+            else if (kds_enemy.indexOf(army_kd) != -1)
+            {
+                army_color = color_enemy;
+            }
+            else
+            {
+                army_color = color_neutral;
+            }
+            
             for (j = 0; j < titles_len; j++)
             {
                 if (army_ruler_name.indexOf(titles_trim[j]) == 0)
@@ -101,6 +157,9 @@ $(document).ready(function ()
 
             army_left = parseInt($(armies[i]).css('left')); //.replace('px','') not needed if using parseInt
             army_top = parseInt($(armies[i]).css('top'));
+            
+
+
            
             army_name_span = $('<span></span>')
             .text(army_race + army_ruler_name)
@@ -110,7 +169,7 @@ $(document).ready(function ()
                 'left' : army_left,
                 'margin-top' : army_margin,
                 'cursor' : 'default',
-                'color' : 'white',
+                'color' : army_color,
                 'font-weight' : 'bold',
                 'font-size' : '0.8em',
                 'z-index' : '10',
@@ -122,7 +181,7 @@ $(document).ready(function ()
             
             $(armies[i]).after(army_name_span);
             army_name_width = parseInt(army_name_span.width());
-            army_name_span.css('left', army_left - Math.floor((army_name_width-18)/2)); //18 = $(armies[i]).width();
+            army_name_span.css('left', army_left - Math.floor((army_name_width-$(armies[i]).width())/2)); //$(armies[i]).width() = 18 for normal army (16 + 2x1 border), 22 for attacking army (16 + 2x3), 28 for frozen (16 + 2x6)
 
             //add army size name and numbers to title
 
@@ -130,17 +189,23 @@ $(document).ready(function ()
         }
 
 
-
+        //cities strCities
         for (i = 0; i < city_len; i++)
         {
             title = $(citynames[i]).attr('title');
             city_name = citynames[i].innerHTML;
+            
+            //Halfling city owned by Mr. Rqwe: 123 buildings.
+            //Human city owned by Mr. Aragorn II of Childrens Playground: 127557 buildings.
 
             name_separator_pos1 = title.indexOf(' city owned by ');
+            //needs regex in case user name has ' of ' in it V (kd name can have of in it too)
             name_separator_pos2 = title.lastIndexOf(' of ');
             name_separator_pos3 = title.indexOf(': ');
             race = title.substring(0, name_separator_pos1);
             race = '[' + race.substr(0,2) + ']';
+            if (name_separator_pos2 == -1)
+                name_separator_pos2 = name_separator_pos3;
             ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos2);
             for (j = 0; j < titles_len; j++)
             {
@@ -158,20 +223,137 @@ $(document).ready(function ()
                 if (ruler_name.length > 10)
                     ruler_name = ruler_name.substring(0, 9);
             }
-            kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3); //needs regex in case kd name has ' of ' in it;
+            kd_name = '';
+            if (name_separator_pos2 != name_separator_pos3)
+                kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3);
             //citynames[i].innerHTML = race + city_name;
             ruler_name_style = $(citynames[i]).attr('style');
-            $(citynames[i]).css('text-shadow', 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px').css('-webkit-font-smoothing', 'antialiased');
-            if (title.indexOf('Your city:') !== 0)
+            $(citynames[i]).css({
+                'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
+                '-webkit-font-smoothing' : 'antialiased'
+            });
+            //color_case = '';
+            if (title.indexOf('Your city:') !== -1)
             {
-                $(citynames[i]).css('color', 'lightgray');
-                $(citynames[i]).before('<span style="' + ruler_name_style + 'text-align: center; width: 100px; height: 20px; cursor: default; color: white; font-weight: bold; text-decoration: none; font-size:0.8em; text-shadow: black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px; -webkit-font-smoothing: antialiased;"><br><br><br>' + race + ruler_name +'</span>');
-                //add city names to title
-                //untagged kds don't have the ' of <kd name>' part, and their name results in race
+                //color_case = color_own;
+                $(citynames[i]).css('color', color_own);
+                kd_found = true;
             }
             else
             {
-                $(citynames[i]).css('color', 'Chartreuse');   
+                kd_found = false;
+                if (title.indexOf(kd_own[0]) !== -1)
+                {
+                    //color_case = color_ownkd;
+                    $(citynames[i]).css('color', color_ownkd);
+                    city_name_span = $('<span style="' + ruler_name_style +'"></span>')
+                    .html('<br><br><br>' + race + ruler_name)
+                    .css({
+                        'width' : '100px',
+                        'height' : '20px',
+                        'text-decoration' : 'none',
+                        'cursor' : 'default',
+                        'color' : color_ownkd,
+                        'font-weight' : 'bold',
+                        'font-size' : '0.8em',
+                        'text-align' : 'center',
+                        'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
+                        '-webkit-font-smoothing' : 'antialiased'
+                    });
+                    $(citynames[i]).before(city_name_span);
+                    //add city names to title
+                    kd_found = true;
+                }
+                if (kd_found) continue;
+                /*for (j = 0; j < kds_neutral.length ; j++)
+                {
+                    if (title.indexOf(kds_neutral[j]) !== -1)
+                    {
+                        //color_case = color_neutral;
+                        $(citynames[i]).css('color', color_neutral);
+                        $(citynames[i]).before('<span style="' + ruler_name_style + 'text-align: center; width: 100px; height: 20px; cursor: default; color: ' + color_neutral + '; font-weight: bold; text-decoration: none; font-size:0.8em; text-shadow: black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px; -webkit-font-smoothing: antialiased;"><br><br><br>' + race + ruler_name +'</span>');
+                        //add city names to title
+                        kd_found = true;
+                        break;
+                    }
+                }
+                if (kd_found) continue;
+                */
+                for (j = 0; j < kds_friendly.length ; j++)
+                {
+                    if (title.indexOf(kds_friendly[j]) !== -1)
+                    {
+                        //color_case = color_friendly;
+                        $(citynames[i]).css('color', color_friendly);
+                        city_name_span = $('<span style="' + ruler_name_style +'"></span>')
+                        .html('<br><br><br>' + race + ruler_name)
+                        .css({
+                            'width' : '100px',
+                            'height' : '20px',
+                            'text-decoration' : 'none',
+                            'cursor' : 'default',
+                            'color' : color_friendly,
+                            'font-weight' : 'bold',
+                            'font-size' : '0.8em',
+                            'text-align' : 'center',
+                            'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
+                            '-webkit-font-smoothing' : 'antialiased'
+                        });
+                        $(citynames[i]).before(city_name_span);
+                        //add city names to title
+                        kd_found = true;
+                        break;
+                    }
+                }
+                if (kd_found) continue;
+                for (j = 0; j < kds_enemy.length ; j++)
+                {
+                    if (title.indexOf(kds_enemy[j]) !== -1)
+                    {
+                        //color_case = color_enemy;
+                        $(citynames[i]).css('color', color_enemy);
+                        city_name_span = $('<span style="' + ruler_name_style +'"></span>')
+                        .html('<br><br><br>' + race + ruler_name)
+                        .css({
+                            'width' : '100px',
+                            'height' : '20px',
+                            'text-decoration' : 'none',
+                            'cursor' : 'default',
+                            'color' : color_enemy,
+                            'font-weight' : 'bold',
+                            'font-size' : '0.8em',
+                            'text-align' : 'center',
+                            'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
+                            '-webkit-font-smoothing' : 'antialiased'
+                        });
+                        $(citynames[i]).before(city_name_span);
+                        //add city names to title
+                        kd_found = true;
+                        break;
+                    }
+                }
+                if (kd_found) continue;
+
+                //neutral,unlisted kds
+                //color_case = color_neutral;
+                $(citynames[i]).css('color', color_neutral);
+                city_name_span = $('<span style="' + ruler_name_style +'"></span>')
+                .html('<br><br><br>' + race + ruler_name)
+                .css({
+                    'width' : '100px',
+                    'height' : '20px',
+                    'text-decoration' : 'none',
+                    'cursor' : 'default',
+                    'color' : color_neutral,
+                    'font-weight' : 'bold',
+                    'font-size' : '0.8em',
+                    'text-align' : 'center',
+                    'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
+                    '-webkit-font-smoothing' : 'antialiased'
+                });
+                $(citynames[i]).before(city_name_span);
+                //add city names to title
+                kd_found = true;
             }
         }
     }
@@ -213,6 +395,7 @@ $(document).ready(function ()
         if ((url.indexOf('#new') == -1) && (url.indexOf('#bottom') != -1))
             navigation.find('a[href="#bottom"]').get(0).click();
         
+        //adds quote button
         //modified from https://static.visual-utopia.com/mobile/pop.js
         $(function () {
             $('<script>')
@@ -221,8 +404,6 @@ $(document).ready(function ()
             .appendTo('head');
         });
         
-        //if http://visual-utopia.com/mobile/forum.asp?f=Bugs+and+Errors&t=City+losing+morel+for+no+reas#reply
-        //<a href="#reply" onclick="javascript: reply(this);">Quote</a>
         $('a[href*="reportmessage"]').after(' &nbsp <a href="#reply" onclick="javascript: reply(this);">Quote</a>');
         
     } //topics in subforum
@@ -661,6 +842,7 @@ $(document).ready(function ()
 // in training window, add max button, and costs next to input boxes
 // in kingdom window, maybe make the forum link open the forum inside the window, not in a new tab; same when the kd button is flashing in the menu
 // kd list window: hide kds that have 0%. some code is already included and commented out in this script
+// kd: add link to your kd, take it from kd list window. you can compare stuff to other kds there.
 // science window: add explanation what each one does, and how much %. add commas to the resources listed at the top of the page
 // science window: add a confirmation dialog when clicking the button.
 // science window: add the amount of missing resources
@@ -880,3 +1062,98 @@ mobilize = 1/2 (optional for humans, for randomly about 4% training losses)
         //human sped up training gives ~4% less troops in total
         //1 xp = random 1-2% bonus op/dp, roughly 1.5%
         //% morale ~= % op/dp
+
+
+
+       //intUserKingdomID <-- user's kd id
+        
+        //army info from strArmies:
+        //1536928#Hai Binh Laden#1367#1876#Mr. Quirinus IV#1##5768#3#10# of Childrens Playground#90599#0#87142#0#0
+        //Army ID#  Army Name   #    #    #  Ruler name   # ##KDID# #  # of Kingdom Name        #usrID# #total troops+1#?#?
+        //1535372#Zzzzzombies   #2006#2351#Mr. Quirinus IV#1##5768##5# of Childrens Playground#90599#0#744#0#0
+        
+        //gives info only about users that have visible armies
+        //also, broken, need to fix unique function to give keys
+        /*
+        var armies_info = strArmies.split('&');
+        armies_info.pop();
+        var armies_info_len = armies_info.length;
+        var army_info = '';
+        var ai_users = [];
+        var ai_userIDs = [];
+        var ai_user_kds = [];
+        var ai_user_kdIDs = [];
+        var ai_unique_user_index = [];
+        var ai_unique_kd_index = [];
+        
+        //function unique(list) {
+        //    var res = [];
+        //    $.each(list, function(i, e) {
+        //        if ($.inArray(ele, res) == -1) res.push(e);
+        //    });
+        //   return res;
+        //}
+        
+        //function unique(value, index, self) { 
+        //    self.indexOf(value) === index;
+        //}
+        
+        //I want this to return keys, not elements
+        Array.prototype.unique = function(a){
+            return function(){ return this.filter(a) }
+        }(function(a,b,c){ return c.indexOf(a,b+1) < 0 });
+        
+        for (i = 0; i < armies_info_len; i++)
+        {
+            army_info = armies_info[i].split('#');
+            ai_users[i] = army_info[4];
+            ai_userIDs[i] = army_info[11];
+            if (army_info[10] == '')
+            {
+                ai_user_kds[i] = '';
+            }
+            else
+            {
+                ai_user_kds[i] = army_info[10].substr(4);
+            }
+            ai_user_kdIDs[i] = army_info[7];
+        }
+        
+ 
+        //get unique users and their: username, user id, kd name, kd id; & dictionary userID --> username
+        ai_unique_user_index = ai_userIDs.unique();
+        alert(ai_unique_user_index);
+        var ai_unique_user_index_len = ai_unique_user_index.length;
+        var userID_to_user_dictionary = [];
+        
+        for (i = 0; i < ai_unique_user_index_len; i++)
+        {
+            ai_users[i] = ai_users[ai_unique_user_index[i]];
+            ai_userIDs[i] = ai_userIDs[ai_unique_user_index[i]];
+            ai_user_kds[i] = ai_user_kds[ai_unique_user_index[i]];
+            ai_user_kdIDs[i] = ai_user_kdIDs[ai_unique_user_index[i]];
+            
+            userID_to_user_dictionary[ai_userIDs[i]] = ai_users[i];
+        }
+        ai_users = ai_users.slice(0, ai_unique_user_index_len - 1);
+        ai_userIDs = ai_userIDs.slice(0, ai_unique_user_index_len - 1);
+        ai_user_kds = ai_user_kds.slice(0, ai_unique_user_index_len - 1);
+        ai_user_kdIDs = ai_user_kdIDs.slice(0, ai_unique_user_index_len - 1);
+        
+        //get unique kds and kd ids; & dictionary ukdID --> kdname
+        ai_unique_kd_index = unique(ai_user_kdIDs);
+        var ai_unique_kd_index_len = ai_unique_kd_index.length;
+        var ai_kds = [];
+        var ai_kdIDs = [];
+        var kdID_to_kd_dictionary = [];
+        
+        for (i = 0; i < ai_unique_kd_index_len; i++)
+        {
+            ai_kds[i] = ai_user_kds[ai_unique_user_index[i]];
+            ai_kdIDs[i] = ai_user_kdIDs[ai_unique_user_index[i]];
+             
+            kdID_to_kd_dictionary[ai_kdIDs[i]] = ai_kds[i];
+        }
+        
+        //alert(kdID_to_kd_dictionary[5768]);
+        */
