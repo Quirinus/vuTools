@@ -298,7 +298,7 @@ $(document).ready(function ()
             {
                 //add for not found armies
                 alert('wrong army size! ' + army_name + ': '+ army_race + ' ' + army_size + ' (' + army_troops  + ')\n'
-                        + army_ruler_name + ' ' + army_kd + army_t3;);
+                        + army_ruler_name + ' ' + army_kd + army_t3);
             }
         }
         
