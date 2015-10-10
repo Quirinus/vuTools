@@ -25,6 +25,7 @@ $(document).ready(function ()
         var title = '';
         var city_name = '';
         var city_name_span = '';
+        var city_ID = -1;
         var race = '';
         var ruler_name = '';
         var ruler_name_space_pos = -1;
@@ -55,9 +56,12 @@ $(document).ready(function ()
         var armies = $.makeArray($('.armyclick'));
         var army_len = armies.length;
         var army_name = '';
+        var army_ID = -1;
         var army_ruler_name = '';
+        var army_ruler_name_short = '';
         var army_size = '';
         var army_race = '';
+        var army_race_short = '';
         var army_kd = '';
         var army_margin = '';
         var army_left = '';
@@ -65,39 +69,103 @@ $(document).ready(function ()
         var army_name_span = '';
         var army_name_width = '';
         var army_color = '';
-        //var army_sizes = ['O Scout (1-5)', 'OO Section (8-12)', 'OOO Platoon (20-50)', 'I Company (100-300)', 'II Battalion (500-1500)', 'III Regiment (2000-4000)', 'X Brigade (Around 5000)',  'XX Division (10,000-20,000)', 'XXX Corps (Around 50,000)', 'XXXX Army (100,000-200,000)', 'XXXXX Group of armies (200,000-1,000,000)?', 'XXXXX Horde More then one million soldiers.?'];
+        var army_size_index = -1;
+        var army_size_signs = ['o', 'oo', 'ooo', 'I', 'I I', 'I I I', 'x',  'xx', 'xxx', 'xxxx', 'xxxxx', 'xxxxx+']; //▮
+        var army_size_names = ['scout', 'section', 'platoon', 'company', 'battalion', 'regiment', 'brigade',  'division', 'corps', 'army', 'group of armies', 'horde'];
+        var army_size_numbers = ['(1-5)', '(8-12)', '(20-50)', '(100-300)', '(500-1500)', '(2000-4000)', '(around 5000)',  '(10,000-20,000)', '(around 50,000)', '(100,000-200,000)', '(200,000-1,000,000)', 'of more then one million soldiers'];
+        //var army_size_real_numbers = ['(1-5)', '(8-12)', '(20-50)', '(100-300)', '(500-1500)', '(2000-4000)', '(Around 5000)',  '(10,000-20,000)', '(Around 50,000)', '(100,000-200,000)', '(200,000-1,000,000)', 'More then one million soldiers.'];
         
         //here you can access variables under $('script:eq(2)), since they're already loaded
         
+
+        //strArmies
+        //gives info about users that have visible armies:
+        //Army ID # Army Name # x # y # Ruler name # r ## KDID # md # as # of Kingdom Name # usrID # a # total troops+1 # m # ?
+        
+        //x position = from -2500 to 2500 (4x2500x2500 = world size)
+        //y position = from -2500 to 2500 (4x2500x2500 = world size)
+        //r = race
+        //missing column between two ##? spells? frozen? aotd? losing troops due to something (morale, -gold, -food)? something to do with injured troops? something with xp? dragon?
+        //md = moving direction (the arrow shows it): 3 north-west, 2 north, 1 north-east, 0 east, -1 south-east, -2 south, -3 south-west, -4 west
+        //as = army size (like the army_sizes array above, 0 o, oo, ooo, 3 I, II, III, 6 X, XX, XXX, XXXX , 10 XXXX, XXXXX, XXXXX)
+        //a = prepping on a town (maybe siege, but don't think so)
+        //m = tier 3 units only in the army, moves faster
+        //? = ? spells? frozen? aotd? losing troops due to something (morale, -gold, -food)? something to do with injured troops? something with xp? dragon?
+        
+        var armies_info = strArmies.split('&');
+        armies_info.pop();
+        var armies_info_len = armies_info.length;
+        var army_info = '';
+        
+        var ai_users = [];
+        //var ai_userIDs = [];
+        var ai_user_kds = [];
+        //var ai_user_kdIDs = [];
+        var ai_armyIDs = [];
+        
+        for (i = 0; i < armies_info_len; i++)
+        {
+            army_info = armies_info[i].split('#');
+            ai_armyIDs[i] = army_info[0];
+            ai_users[i] = army_info[4];
+            //ai_userIDs[i] = army_info[11];
+            if (army_info[10] == '')
+            {
+                ai_user_kds[i] = '';
+            }
+            else
+            {
+                ai_user_kds[i] = army_info[10].substr(4);
+            }
+            //ai_user_kdIDs[i] = army_info[7];
+        }
+        var armyID_check_index = -1;
         
         
-        //armies strArmies 
+        //armies
         $('div[style*="arrow"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)'); //css('z-index', '2'); // and add image map with coordinates from img, rotated for each
         $('img[src*="armysize"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)').css('z-index', '2');
         $('img[src*="reddot"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)');
         
         for (i = 0; i < army_len; i++)
         {
+            //Hai Binh Laden: Your army, click to move it //not in armies array (since it doesn't have class armyclick
             //People of Adolf Eichmann: Dwarf platoon controlled by Mr. Adolf Eichmann
             //Iamabazturd: Troll corps controlled by Mr. Todd L Fondler of Childrens Playground
-            //Army of the Dead: Elf company controlled by Sir Zeons Fess Leader
+            //Army of the Dead: Elf company controlled by Sir Zeons Fess Leader of Zeon
             
             title = $(armies[i]).attr('title');
+            army_ID = $(armies[i]).attr('onclick').replace("pop('armyInfoE.asp?armyID=", '').replace("')", '');
             name_separator_pos1 = title.indexOf(': ');
             name_separator_pos2 = title.substring(name_separator_pos1 + ': '.length).indexOf(' ');
             name_separator_pos3 = title.substring(name_separator_pos2  + ' '.length).indexOf(' ');
             name_separator_pos4 = title.indexOf(' controlled by ');
-            //needs regex in case user name has ' of ' in it V (kd name can have of in it too)
-            name_separator_pos5 = title.substring(name_separator_pos4 + ' controlled by '.length).indexOf(' of ');
 
             army_name = title.substring(0, name_separator_pos1);
             army_race = title.substring(name_separator_pos1 + ': '.length, name_separator_pos1 + ': '.length + name_separator_pos2);
-            army_size = title.substring(title.indexOf(army_race) + army_race.length, name_separator_pos4);
+            army_size = title.substring(title.indexOf(army_race) + army_race.length, name_separator_pos4).trim();
+            army_race_short = '[' + army_race.substr(0,2) + ']';
+            
+            name_separator_pos5 = title.substring(name_separator_pos4 + ' controlled by '.length).indexOf(' of ');
 
             if (name_separator_pos5 != -1)
             {
-                army_ruler_name = title.substring(name_separator_pos4 + ' controlled by '.length, name_separator_pos4 + ' controlled by '.length + name_separator_pos5);
-                army_kd = title.substring(title.indexOf(army_ruler_name) + army_ruler_name.length + ' of '.length);
+                //cross-check of strArmies with army_ID if number of 'of' > 0, since names can be like:
+                //Iamabazturd: Troll corps controlled by Mr. Todd of L of Fondler of Childrens of Playground
+                //ie., no idea where kd/user name starts or even if it's all just a username
+                armyID_check_index = ai_armyIDs.indexOf(army_ID);
+                if (armyID_check_index != -1)
+                {
+                    army_ruler_name = ai_users[armyID_check_index];
+                    army_kd = ai_user_kds[armyID_check_index];
+                }
+                else
+                {
+                    //error,try to do it with the classic method that may fail in complicated cases and give wrong user/kd name cutoffs
+                    army_ruler_name = title.substring(name_separator_pos4 + ' controlled by '.length, name_separator_pos4 + ' controlled by '.length + name_separator_pos5);
+                    army_kd = title.substring(title.indexOf(army_ruler_name) + army_ruler_name.length + ' of '.length);
+                }
+
             }
             else
             {
@@ -105,7 +173,7 @@ $(document).ready(function ()
                 army_kd = '';
             }
             
-
+            
             if (army_ruler_name == strRulerName)
             {
                 army_color = color_own;
@@ -127,24 +195,25 @@ $(document).ready(function ()
                 army_color = color_neutral;
             }
             
+            army_ruler_name_short = army_ruler_name;
             for (j = 0; j < titles_len; j++)
             {
-                if (army_ruler_name.indexOf(titles_trim[j]) == 0)
+                if (army_ruler_name_short.indexOf(titles_trim[j]) == 0)
                 {
-                    army_ruler_name = army_ruler_name.slice(titles_trim[j].length);
+                    army_ruler_name_short = army_ruler_name_short.slice(titles_trim[j].length);
                     break;
                 }
             }
-            if (army_ruler_name.length > 10)
+            if (army_ruler_name_short.length > 10)
             {
-                ruler_name_space_pos = army_ruler_name.indexOf(' ');
+                ruler_name_space_pos = army_ruler_name_short.indexOf(' ');
                 if (ruler_name_space_pos != -1)
-                    army_ruler_name = army_ruler_name.substring(0, ruler_name_space_pos);
-                if (army_ruler_name.length > 10)
-                    army_ruler_name = army_ruler_name.substring(0, 9);
+                    army_ruler_name_short = army_ruler_name_short.substring(0, ruler_name_space_pos);
+                if (army_ruler_name_short.length > 10)
+                    army_ruler_name_short = army_ruler_name_short.substring(0, 9);
             }
 
-            army_race = '[' + army_race.substr(0,2) + ']';
+            
 
             if ($(armies[i]).hasClass('attackingarmy') || $(armies[i]).hasClass('frozen'))
             {
@@ -162,7 +231,7 @@ $(document).ready(function ()
 
            
             army_name_span = $('<span></span>')
-            .text(army_race + army_ruler_name)
+            .text(army_race_short + army_ruler_name_short)
             .css({
                 'position' : 'absolute',
                 'top' : army_top,
@@ -177,36 +246,122 @@ $(document).ready(function ()
                 'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
                 '-webkit-font-smoothing' : 'antialiased'
             });
-            
+
             
             $(armies[i]).after(army_name_span);
             army_name_width = parseInt(army_name_span.width());
             army_name_span.css('left', army_left - Math.floor((army_name_width-$(armies[i]).width())/2)); //$(armies[i]).width() = 18 for normal army (16 + 2x1 border), 22 for attacking army (16 + 2x3), 28 for frozen (16 + 2x6)
 
             //add army size name and numbers to title
-
-            
+            army_size_index = army_size_names.indexOf(army_size);
+            if (army_size_index != -1)
+            {
+                army_kd = (army_kd !== '') ? 'of ' + army_kd : '';
+                $(armies[i]).attr('title', army_size_signs[army_size_index] + ' '+ army_name + ' ' + army_size_numbers[army_size_index] + ':\n' + army_race + ' ' + army_size  + ' controlled by ' + army_ruler_name + ' ' + army_kd);
+            }
+            else
+            {
+                //add for not found armies
+                alert('wrong army size! ' + army_name + ': ' + army_race + ' ' + army_size + ' controlled by ' + army_ruler_name + ' ' + army_kd);
+            }
+            //add for own armies
         }
 
+        //city info from strCities:
+        //cityID # city name # s # grc # x # y # ruler name # r ## kdID # g # of kd name # losgt # usrID # buildings
+        
+        //s = city pic size
+        //grc = city pic race
+        //x = from -2500 to 2500 (4x2500x2500 = world size)
+        //y = from -2500 to 2500 (4x2500x2500 = world size)
+        //r = race
+        //missing column between two ## = spells? arma?
+        //g = gates none or open 0, closed 1
+        //losgt = extra line of sight from guardtowers, round or ceil(guartower number/2) = losgt;
 
-        //cities strCities
+        //strCities
+        //gives info about users that have visible cities
+        var cities_info = strCities.split('&');
+        cities_info.pop();
+        var cities_info_len = cities_info.length;
+        var city_info = '';
+
+        var ci_users = [];
+        //var ci_userIDs = [];
+        var ci_user_kds = [];
+        //var ci_user_kdIDs = [];
+        var ci_cityIDs = [];
+        var ci_city_names = [];
+
+        for (i = 0; i < cities_info_len; i++)
+        {
+            city_info = cities_info[i].split('#');
+            ci_cityIDs[i] = city_info[0];
+            ci_city_names[i] = city_info[1];
+            ci_users[i] = city_info[6];
+            //ci_userIDs[i] = city_info[11];
+            /*if (city_info[10] == '')
+            {
+                ci_user_kds[i] = '';
+            }
+            else
+            {
+                ci_user_kds[i] = city_info[10].substr(4);
+            }*/
+            //ci_user_kdIDs[i] = city_info[7];
+        }
+        var cityID_check_index = -1;
+
+        
+        //cities
         for (i = 0; i < city_len; i++)
         {
             title = $(citynames[i]).attr('title');
             city_name = citynames[i].innerHTML;
+            city_ID = $(citynames[i]).attr('onclick').replace("pop('cityInfoE.asp?cityID=", '').replace("')", '');
             
+            //Your city: 13988 buildings.
             //Halfling city owned by Mr. Rqwe: 123 buildings.
             //Human city owned by Mr. Aragorn II of Childrens Playground: 127557 buildings.
+            //Human city owned by Mr. Aragorn of II of Childrens of Playground: 127557 buildings.
 
             name_separator_pos1 = title.indexOf(' city owned by ');
-            //needs regex in case user name has ' of ' in it V (kd name can have of in it too)
-            name_separator_pos2 = title.lastIndexOf(' of ');
-            name_separator_pos3 = title.indexOf(': ');
             race = title.substring(0, name_separator_pos1);
             race = '[' + race.substr(0,2) + ']';
-            if (name_separator_pos2 == -1)
-                name_separator_pos2 = name_separator_pos3;
-            ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos2);
+            //needs a cross-check with strCities with city_name & race  if number of 'of' > 0, since names can be like:
+            //Human city owned by Mr. Todd of L of Fondler of Childrens of Playground: 127557 buildings.
+            //ie., no idea where kd/user name starts or even if it's all just a username
+            name_separator_pos2 = title.indexOf(' of ');
+            name_separator_pos3 = title.indexOf(': ');
+            
+            if (name_separator_pos2 != -1)
+            {
+                //cross-check strArmies with army_ID if number of 'of' > 0, since names can be like:
+                //Iamabazturd: Troll corps controlled by Mr. Todd of L of Fondler of Childrens of Playground
+                //ie., no idea where kd/user name starts or even if it's all just a username
+                cityID_check_index = ci_cityIDs.indexOf(city_ID);
+                if (cityID_check_index != -1)
+                {
+                    ruler_name = ci_users[cityID_check_index];
+                    //kd_name = ci_user_kds[cityID_check_index];
+                }
+                else
+                {
+                    //error,try to do it with the classic method that may fail in complicated cases and give wrong user/kd name cutoffs
+                    ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos2);
+                    //kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3);
+                }
+
+            }
+            else
+            {
+                ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos3);
+                //kd_name = '';
+            }
+            
+            
+            
+            
             for (j = 0; j < titles_len; j++)
             {
                 if (ruler_name.indexOf(titles_trim[j]) == 0)
@@ -223,9 +378,7 @@ $(document).ready(function ()
                 if (ruler_name.length > 10)
                     ruler_name = ruler_name.substring(0, 9);
             }
-            kd_name = '';
-            if (name_separator_pos2 != name_separator_pos3)
-                kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3);
+            
             //citynames[i].innerHTML = race + city_name;
             ruler_name_style = $(citynames[i]).attr('style');
             $(citynames[i]).css({
@@ -816,6 +969,16 @@ $(document).ready(function ()
 });
     //<div title="Halfling city owned by Mr. Ruthless The Tall of Childrens Playground: 27539 buildings." onclick="pop('cityInfoE.asp?cityID=493328')" style="position: absolute; top:3848; left: 3524;" class="citynames">The PalaceHalfling city owned by Mr. Ruthless The Tall of Childrens Playground: 27539 buildings.</div>
 
+//cities code: maybe instead of using loops:
+             /*for (j = 0; j < kds_friendly.length ; j++)
+                {
+                    if (title.indexOf(kds_friendly[j]) !== -1)
+                    {*/
+   //use:
+              //if (kds_friendly.indexOf(kd_name) !== -1)
+              //{
+   //have to think which is more reliable probably the second one by far, but the second one is definitely faster and more elegant; if you do this, turn ci_user_kds on again
+
 //build page: add number of resource jobs in some of the titles, eg. prod% 
 //build page: remove the extensions from towns with no resource_jobs, and fix the title
 //build page: reconstruct productivity, so the current%/total% is all wrapped up in the span, so all is red, and all has the same title. then the titles includes unfilled jobs (+plus up/down/stable) and peasants + slaves working numbers. and add numberWithCommas to numbers.
@@ -823,6 +986,7 @@ $(document).ready(function ()
 //every popup window: add underdotted to every element that has a title
 // replace .replace(/[^0-9]+/g, '') with a new method called .stripNonNum(optional delimiter), where if delimiter != undefined then get all numbers and return them as a delimited string
 //map: add city name to title
+//map: z-order of self army vs other armies, vs army names, vs city names...
 //hide/remove some waypoints (from kd page list and from map)
 //add extra X or some other sign like for armies of the last size, or two rows, one with 3X and the other with 2X
 //wut, opens when you click on the KD button: http://visual-utopia.com/forum.asp?f=Childrens%20Playground&t=Battle%20Reports&replies=42

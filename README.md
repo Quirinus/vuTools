@@ -3,10 +3,11 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 ### Features
 ######Map:
 - all armies and cities have **[race]short_player_name** under them
+- added army numbers and signs to army mouseover titles
 - city and army (ruler) names colored according to kd relations:
- - self, own kd, friendly kd, neutral kd, enemy kd
+ - self, own kd, friendly kd, neutral (kd), enemy kd
 - army size indicators, movement direction arrow and army path are white
-- all names (except waypoints) have an an outline around them
+- all names (except waypoints) have an an outline around them for easier spotting
 
 ######Build window:
 - added Tax% to the top, mouseover to see numbers
@@ -35,11 +36,11 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - quote function
 
 ######Training window:
-- for Human players:
- - added Mobilization training times
- - added Mobilization warnings
- - changed Mobilization button title to be more clear
+- for Human players; Mobilization:
+ - added training times and warnings
+ - changed button title to be more clear
 
 ### Coming up
 - City building window automatic number calculations and suggestions
+- Training automatic number filling and costs
 - Improvements in other windows
