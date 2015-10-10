@@ -3,9 +3,11 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 ### Features
 ######Map:
 - all armies and cities have **[race]short_player_name** under them
-- added army numbers and signs to army mouseover titles
+- armies display number of troops when you hover over them
+- armies display if they have only tier 3 troops and movement bonus if you hover over them
+- cities display the number of guardtowers up to 2,000 when you hover over them
 - city and army (ruler) names colored according to kd relations:
- - self, own kd, friendly kd, neutral (kd), enemy kd
+ - self, own kd, friendly kd, neutral kd, neutral no kd, enemy kd
 - army size indicators, movement direction arrow and army path are white
 - all names (except waypoints) have an an outline around them for easier spotting
 
