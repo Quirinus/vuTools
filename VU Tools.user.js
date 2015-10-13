@@ -81,6 +81,15 @@ $(document).ready(function ()
         }")
         .appendTo('head');
     });
+    
+    $(function () { //a clone for the page, not this script
+        $('<script>')
+        .attr('type', 'text/javascript')
+        .text("function addSlaves(slaves, cityID, cityName) { \
+                amount = prompt('How many slaves do you want to transfer to ' + cityName + ' ?\\n(Use minus to remove slaves)', slaves); \
+                if(amount) go('addSlaves.asp?cityID=' + cityID + '&amount=' + amount); }")
+        .appendTo('head');
+    });
             
         
     /*function numberWithCommas_unselectable(x) {
@@ -1124,8 +1133,31 @@ $(document).ready(function ()
 
         var max_buildings_capacity = total_buildings + c_build_space_left;
         
-        var slaves_working = 0;
-        var slaves_unused = 0;
+        //slaves for productivity handling, default value for transfer slaves
+        var slaves_missing = 0;
+        var slaves_working = resource_jobs - c_peasants;
+        if (slaves_working < 0)
+            slaves_working = 0;
+        if (slaves_used < slaves_working)
+        {
+            slaves_missing = slaves_working - slaves_used;
+            slaves_working = slaves_used;
+        }
+        var slaves_unused = slaves_used - slaves_working;
+        var slaves_add_remove = 0;
+        if (slaves_unused > 0)
+            slaves_add_remove = -slaves_unused;
+        else if (slaves_missing > 0)
+        {
+            if (slaves_missing > g_slaves) //aslaves = g_slaves
+                slaves_add_remove = g_slaves;
+            else
+                slaves_add_remove = slaves_missing;
+        }   
+        $('button.slaves:eq(0)').attr('onclick', 'addSlaves("' + slaves_add_remove.toString() + '", "' + cityID.toString() + '", "' + cityName.toString() + '")');
+        $('table:eq(1) tr:eq(1) td:eq(1)').html(numberWithCommas($('table:eq(1) tr:eq(1) td:eq(1)').html().trim()) + ' <span style="font-weight:bold;">/</span> <span title="The amount of slaves needed for 100% production." class="underdotted">' + numberWithCommas(slaves_used + slaves_add_remove));
+        
+        
         
         /*
         var pop_percent_peasants = Math.floor(c_peasants*100/(b1*25));
@@ -1143,29 +1175,8 @@ $(document).ready(function ()
         }
         */
         
-        var peasants_percent = Math.round(100*c_peasants/(b1*25));
-        var army_percent = pop_percent - peasants_percent;
-        var estimated_army_number = Math.round(army_percent*b1*25/100);
-        var pop_full = Math.round(b1*25*pop_percent/100);
-        var pop_empty = b1*25 - pop_full;
-        $('table:eq(0) tr:eq(0) th:eq(2)').after('<th>Pop</th>');
-        $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big"><span class="underdotted" title="Total population, peasants and army troops, is about ' + numberWithCommas(pop_full) + ' ± ' + Math.round(b1*25/(100*2)) + '.\nIn total there\'s room for ' + numberWithCommas(b1*25) + ' people, and about ' + numberWithCommas(pop_empty) + ' ± ' + Math.round(b1*25/(100*2)) + ' of it is unused.">' + pop_percent.toString() + '%</span><br><span class="underdotted" style="font-size:small;" title="There\'s ' + numberWithCommas(c_peasants) + ' peasants in the city.">' + peasants_percent.toString() + '%</span> + <span class="underdotted" style="font-size:small;" title="There\'s about ' + numberWithCommas(estimated_army_number) + ' ± ' + Math.round(b1*25/(100*2)) + ' troops in the city.">' + army_percent.toString() + '%</span></td>');
         
-            
-        var tax_percent = Math.floor(c_peasants*100/total_jobs); //Math.floor((total_jobs - tax_jobs_unfilled)*100/total_jobs)';
-        $('table:eq(0) tr:eq(0) th:eq(2)').after('<th>Tax</th>');
-        if (tax_percent > 100)
-        {
-            tax_percent = 100;
-            $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big" title="' + numberWithCommas(c_peasants_unemployed) + ' peasants are unemployed and not paying tax.\nBuild ' + numberWithCommas(job_buildings_missing) + ' more non-house buildings to generate jobs, train them to military, or move them to where there is jobs available." style="color: red"><span class="underdotted">' + tax_percent.toString() + '%</span></td>');
-        }
-        else
-        {
-            $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big" title="There are jobs not filled by peasants.\nGet ' + numberWithCommas(tax_jobs_unfilled) + ' more peasants to generate maximum tax."><span class="underdotted">' + tax_percent.toString() + '%</span></td>');
-        }
-        
-        
-        //productivity
+        //productivity%
         var productivity_info = $('table:eq(0) tr:eq(1) td:eq(2)');
         //productivity_info.html(productivity_info.child().wrap("<span class='underdotted'></span>"));
         var productivity = parseInt(productivity_info.text());
@@ -1174,10 +1185,31 @@ $(document).ready(function ()
         var productivity_percent_peasants = (resource_jobs === 0) ? 0 : Math.round(c_peasants*100/resource_jobs); //can be over 100%
         var productivity_percent_slaves = (resource_jobs === 0) ? 0 : Math.round(slaves_used*100/resource_jobs);
         productivity_info.children(':eq(0)').attr('title', numberWithCommas(productivity_info.children(':eq(0)').attr('title'))).addClass('underdotted');
-        productivity_info.html(productivity_info.html() + '/<span class="underdotted" title="Productivity due to ' + numberWithCommas(slaves_used + c_peasants) + ' peasants and slaves.">' + productivity_percent_real.toString() + '%</span><br><span style="font-size:small;"><span class="underdotted" title="Productivity due to ' + numberWithCommas(c_peasants) + ' peasants.">' +
-        productivity_percent_peasants.toString() + '%</span> + <span class="underdotted" title="Productivity due to ' + numberWithCommas(slaves_used) + ' slaves.">' + productivity_percent_slaves.toString() + '%</span></span>');
+        productivity_info.html(productivity_info.html() + '/<span class="underdotted" title="Productivity due to ' + numberWithCommas(slaves_used + c_peasants) + ' peasants and slaves working in resouce-generating buildings.">' + productivity_percent_real.toString() + '%</span><br><span style="font-size:small;"><span class="underdotted" title="Productivity due to ' + numberWithCommas(c_peasants) + ' peasants working in resouce-generating buildings.">' +
+        productivity_percent_peasants.toString() + '%</span> + <span class="underdotted" title="Productivity due to ' + numberWithCommas(slaves_used) + ' slaves working in resouce-generating buildings.">' + productivity_percent_slaves.toString() + '%</span></span>');
         $('table:eq(0) tr:eq(1) td:eq(1) :eq(0)').attr('title', numberWithCommas($('table:eq(0) tr:eq(1) td:eq(1) :eq(0)').attr('title'))).addClass('underdotted');
         
+        //population%
+        var peasants_percent = Math.round(100*c_peasants/(b1*25));
+        var army_percent = pop_percent - peasants_percent;
+        var estimated_army_number = Math.round(army_percent*b1*25/100);
+        var pop_full = Math.round(b1*25*pop_percent/100);
+        var pop_empty = b1*25 - pop_full;
+        $('table:eq(0) tr:eq(0) th:eq(2)').after('<th>Pop</th>');
+        $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big"><span class="underdotted" title="Total population, peasants and army troops, is about ' + numberWithCommas(pop_full) + ' ± ' + Math.round(b1*25/(100*2)) + '.\nIn total there\'s room for ' + numberWithCommas(b1*25) + ' people, and about ' + numberWithCommas(pop_empty) + ' ± ' + Math.round(b1*25/(100*2)) + ' of it is unused.">' + pop_percent.toString() + '%</span><br><span class="underdotted" style="font-size:small;" title="There\'s ' + numberWithCommas(c_peasants) + ' peasants in the city.">' + peasants_percent.toString() + '%</span> + <span class="underdotted" style="font-size:small;" title="There\'s about ' + numberWithCommas(estimated_army_number) + ' ± ' + Math.round(b1*25/(100*2)) + ' troops in the city.">' + army_percent.toString() + '%</span></td>');
+        
+        //tax%
+        var tax_percent = Math.floor(c_peasants*100/total_jobs); //Math.floor((total_jobs - tax_jobs_unfilled)*100/total_jobs)';
+        $('table:eq(0) tr:eq(0) th:eq(1)').after('<th>Tax</th>');
+        if (tax_percent > 100)
+        {
+            tax_percent = 100;
+            $('table:eq(0) tr:eq(1) td:eq(1)').after('<td class="big" title="' + numberWithCommas(c_peasants_unemployed) + ' peasants are unemployed and not paying tax.\nBuild ' + numberWithCommas(job_buildings_missing) + ' more non-house buildings to generate jobs, train them to military, or move them to where there is jobs available." style="color: red"><span class="underdotted">' + tax_percent.toString() + '%</span></td>');
+        }
+        else
+        {
+            $('table:eq(0) tr:eq(1) td:eq(1)').after('<td class="big" title="There are jobs not filled by peasants.\nGet ' + numberWithCommas(tax_jobs_unfilled) + ' more peasants to generate maximum tax."><span class="underdotted">' + tax_percent.toString() + '%</span></td>');
+        }
         
         //$('#infotext').wrap('<span style="pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; -o-user-select: none; user-select: none;"></span>');
         //$('#infotext').html(numberWithCommas_unselectable($('#infotext').html()));

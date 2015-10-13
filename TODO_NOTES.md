@@ -120,17 +120,17 @@ mobilize = 1/2 (optional for humans, for randomly about 4% training losses)
 - DONE: in production window, separate total tax and total gold from mines, then show them combined under it
 - DONE: split tax and mine gold income
 
-- http://static.visual-utopia.com/
-- http://static.visual-utopia.com/images/
-- http://static.visual-utopia.com/images/dragon.gif
-- https://static.visual-utopia.com/menu.js
-- https://static.visual-utopia.com/pop.js
-- https://static.visual-utopia.com/pngfix.js
-- https://static.visual-utopia.com/build.js
-- https://static.visual-utopia.com/style.css?v=3
-- http://static.visual-utopia.com/
-- http://static.visual-utopia.com/images/
-- http://static.visual-utopia.com/images/dragon.gif
+http://static.visual-utopia.com/
+http://static.visual-utopia.com/images/
+http://static.visual-utopia.com/images/dragon.gif
+https://static.visual-utopia.com/menu.js
+https://static.visual-utopia.com/pop.js
+https://static.visual-utopia.com/pngfix.js
+https://static.visual-utopia.com/build.js
+https://static.visual-utopia.com/style.css?v=3
+http://static.visual-utopia.com/
+http://static.visual-utopia.com/images/
+http://static.visual-utopia.com/images/dragon.gif
 
 
 

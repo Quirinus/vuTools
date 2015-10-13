@@ -15,6 +15,8 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - added Tax% to the top; mouseover to see numbers
 - added Pop%, with peasant and army pop%; mouseover them
 - Prod% expanded with: real total prod., peasant and slave productivity; mouseover to see numbers
+- shows optimal slaves number suggestion
+- the optimal amount of slaves to add/remove is automatically entered in the prompt
 - everything that is underdotted has mouseover titles that give additional info
 
 ######Kingdom window:
