@@ -2,7 +2,7 @@
 A userscript to improve various user interface bits of the Visual Utopia browser game.
 ### Features
 ######Map:
-- all armies and cities have **[race]short_player_name** under them
+- all armies and cities have **[race]short_player_name** under them (the ones on armies are clickable)
 - armies display number of troops when you hover over them
 - armies display if they have only tier 3 troops and movement bonus if you hover over them
 - cities display the number of guardtowers up to 2,000 when you hover over them
@@ -38,6 +38,11 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - quote function
 
 ######Training window:
+- added total training costs under tier of units
+- added total gold costs to train all tier units to top and bottom
+- added Max buttons next to each tier unit (turns to Clear when max trainable number is in the input box)
+- input box now doesn't allow you to enter more than max amount of trainable units
+- added another train button to the top
 - for Human players; Mobilization:
  - added training times and warnings
  - changed button title to be more clear

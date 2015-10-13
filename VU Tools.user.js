@@ -18,10 +18,69 @@ $(document).ready(function ()
     
     var url = window.location.href;
     
+    /*$(function () {
+        $('<script>')
+        .attr('type', 'text/javascript')
+        .text(' $.fn.ready(function(){var b=$(".nonselectable"),c=$(".selectable");b.on("dragstart, selectstart",function(a){a.preventDefault()});c.on("dragstart, selectstart",function(a){a.stopPropagation()});b.find("*").andSelf().attr("unselectable","on");c.find("*").andSelf().removeAttr("unselectable")});')
+        .appendTo('head');
+    });
+    
+    $(function () {
+        $('<style>')
+        .attr('type', 'text/css')
+        .text('.nonselectable{\
+              cursor: default;\
+              border: 0;\
+              color: inherit;\
+              background-color: inherit;\
+              font:inherit;\
+              pointer-events: none;\
+              -webkit-touch-callout: none;\
+              -webkit-user-select: none;\
+              -khtml-user-drag:none;\
+              -khtml-user-select: none;\
+              -moz-user-select: -moz-none;\
+              -moz-user-select: none;\
+              -ms-user-select: none;\
+              -o-user-select: none;\
+              user-select: none;}\
+               ')
+        .appendTo('head');
+    });*/
+    
     //http://stackoverflow.com/a/2901298
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+    $(function () { //a clone for the page, not this script
+        $('<script>')
+        .attr('type', 'text/javascript')
+        .text("function numberWithCommasx(x) { return x.toString().replace(/[0-9](?=(?:[0-9]{3})+(?![0-9]))/g, '$&,'); }; ")
+        .appendTo('head');
+    });
+    $(function () { //a clone for the page, not this script
+        $('<script>')
+        .attr('type', 'text/javascript')
+        .text("function sum_training_gold_cost() \
+        { \
+            var sum = \
+                parseInt((document.getElementById('t1_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')) + \
+                parseInt((document.getElementById('t2_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')) + \
+                parseInt((document.getElementById('t3_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')) + \
+                parseInt((document.getElementById('t4_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')) + \
+                parseInt((document.getElementById('t5_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')); \
+                document.getElementById('total_training_costs').innerHTML = numberWithCommasx(sum); \
+                document.getElementById('total_training_costs2').innerHTML = numberWithCommasx(sum); \
+        }")
+        .appendTo('head');
+    });
+            
+        
+    /*function numberWithCommas_unselectable(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "<span class='nonselectable'>,</span>");
+    }*/
+    
+    var text_info = '';
     
     if (url.indexOf('main.asp') != -1)
     {
@@ -63,6 +122,7 @@ $(document).ready(function ()
 
         var armies = $.makeArray($('.armyclick'));
         var army_len = armies.length;
+        var army_onclick = '';
         var army_name = '';
         var army_ID = -1;
         var army_ruler_name = '';
@@ -81,8 +141,8 @@ $(document).ready(function ()
         var army_color = '';
         var army_size_index = -1;
         var army_size_signs = ['o', 'oo', 'ooo', 'I', 'I I', 'I I I', 'x',  'xx', 'xxx', 'xxxx', 'xxxxx', 'xxxxx+']; //▮
-        var army_size_names = ['scout', 'section', 'platoon', 'company', 'battalion', 'regiment', 'brigade',  'division', 'corps', 'army', 'group of armies', 'horde'];
-        var army_size_numbers = ['(1-5)', '(8-12)', '(20-50)', '(100-300)', '(500-1500)', '(2000-4000)', '(around 5000)',  '(10,000-20,000)', '(around 50,000)', '(100,000-200,000)', '(200,000-1,000,000)', 'of more then one million soldiers'];
+        var army_size_names = ['scout', 'section', 'platoon', 'company', 'battalion', 'regiment', 'brigade',  'division', 'corps', 'army', 'army group', 'horde'];
+        var army_size_numbers = ['(1-5)', '(8-12)', '(20-50)', '(100-300)', '(500-1500)', '(2000-4000)', '(around 5000)',  '(10,000-20,000)', '(around 50,000)', '(100,000-200,000)', '(around 500,000)', 'of more then one million soldiers']; //around 500,000 --> (200,000-1,000,000)
         //var army_size_real_numbers = ['(1-5)', '(8-12)', '(20-50)', '(100-300)', '(500-1500)', '(2000-4000)', '(Around 5000)',  '(10,000-20,000)', '(Around 50,000)', '(100,000-200,000)', '(200,000-1,000,000)', 'More then one million soldiers.'];
         
         //here you can access variables under $('script:eq(2)), since they're already loaded
@@ -122,9 +182,9 @@ $(document).ready(function ()
             ai_armyIDs[i] = army_info[0];
             ai_users[i] = army_info[4];
             //ai_userIDs[i] = army_info[11];
-            ai_troops[i] = ' ' + numberWithCommas(parseInt(army_info[13])-1) + ' troops';
+            ai_troops[i] = numberWithCommas(parseInt(army_info[13])-1) + ' troops';
             if (ai_troops[i] == '1 troops')
-                ai_troops[i] = '1 unit';
+                ai_troops[i] = '1 soldier';
             ai_t3[i] = (army_info[14] == '0') ? '' : '\nOnly tier 3 troops - movement bonus.';
             if (army_info[10] == '')
             {
@@ -147,7 +207,8 @@ $(document).ready(function ()
         for (i = 0; i < army_len; i++)
         {
             title = $(armies[i]).attr('title');
-            army_ID = $(armies[i]).attr('onclick').replace("pop('armyInfoE.asp?armyID=", '').replace("')", '');
+            army_onclick = $(armies[i]).attr('onclick');
+            army_ID = army_onclick.replace("pop('armyInfoE.asp?armyID=", '').replace("')", '');
             name_separator_pos1 = title.indexOf(': ');
             name_separator_pos2 = title.substring(name_separator_pos1 + ': '.length).indexOf(' ');
             name_separator_pos3 = title.substring(name_separator_pos2  + ' '.length).indexOf(' ');
@@ -261,23 +322,25 @@ $(document).ready(function ()
 
 
            
-            army_name_span = $('<span></span>')
+            army_name_span = $('<a></a>')
             .text(army_race_short + army_ruler_name_short)
             .css({
                 'position' : 'absolute',
+                'text-decoration' : 'none',
+                'cursor' : 'pointer',
                 'top' : army_top,
                 'left' : army_left,
                 'margin-top' : army_margin,
-                'cursor' : 'default',
                 'color' : army_color,
                 'font-weight' : 'bold',
                 'font-size' : '0.8em',
-                'z-index' : '10',
+                //'z-index' : '10',
                 'text-align' : 'center',
                 'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
                 '-webkit-font-smoothing' : 'antialiased'
             })
-            .attr('title', title);
+            .attr('title', title)
+            .attr('onclick', army_onclick);
 
             
             $(armies[i]).after(army_name_span);
@@ -298,7 +361,7 @@ $(document).ready(function ()
             {
                 //add for not found armies
                 alert('wrong army size! ' + army_name + ': '+ army_race + ' ' + army_size + ' (' + army_troops  + ')\n'
-                        + army_ruler_name + ' ' + army_kd + army_t3);
+                        + army_ruler_name + ' ' + army_kd + army_t3); //group of armies causes this to pop up
             }
         }
         
@@ -367,7 +430,7 @@ $(document).ready(function ()
             {
                 city_gts = ci_city_gts[i] + ' guardtowers.';
             }
-            title = $(citynames[i]).attr('title');
+            title = numberWithCommas($(citynames[i]).attr('title'));
             title = title + ' ' + city_gts;
             title = title.replace(': ', ':\r');
             $(citynames[i]).attr('title', title);
@@ -407,7 +470,7 @@ $(document).ready(function ()
             
             for (j = 0; j < titles_len; j++)
             {
-                if (ruler_name.indexOf(titles_trim[j]) == 0)
+                if (ruler_name.indexOf(titles_trim[j]) === 0)
                 {
                     ruler_name = ruler_name.slice(titles_trim[j].length);
                     break;
@@ -444,10 +507,11 @@ $(document).ready(function ()
                     //color_case = color_ownkd;
                     $(citynames[i]).css('color', color_ownkd);
                     city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                    .html('<br><br><br>' + race + ruler_name)
+                    .html(race + ruler_name)
                     .css({
                         'width' : '100px',
                         'height' : '20px',
+                        'margin-top' : '3em',
                         'text-decoration' : 'none',
                         'cursor' : 'default',
                         'color' : color_ownkd,
@@ -470,10 +534,11 @@ $(document).ready(function ()
                         //color_case = color_friendly;
                         $(citynames[i]).css('color', color_friendly);
                         city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                        .html('<br><br><br>' + race + ruler_name)
+                        .html(race + ruler_name)
                         .css({
                             'width' : '100px',
                             'height' : '20px',
+                            'margin-top' : '3em',
                             'text-decoration' : 'none',
                             'cursor' : 'default',
                             'color' : color_friendly,
@@ -498,10 +563,11 @@ $(document).ready(function ()
                         //color_case = color_neutral;
                         $(citynames[i]).css('color', color_neutral);
                         city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                        .html('<br><br><br>' + race + ruler_name)
+                        .html(race + ruler_name)
                         .css({
                             'width' : '100px',
                             'height' : '20px',
+                            'margin-top' : '3em',
                             'text-decoration' : 'none',
                             'cursor' : 'default',
                             'color' : color_neutral,
@@ -526,10 +592,11 @@ $(document).ready(function ()
                         //color_case = color_enemy;
                         $(citynames[i]).css('color', color_enemy);
                         city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                        .html('<br><br><br>' + race + ruler_name)
+                        .html(race + ruler_name)
                         .css({
                             'width' : '100px',
                             'height' : '20px',
+                            'margin-top' : '3em',
                             'text-decoration' : 'none',
                             'cursor' : 'default',
                             'color' : color_enemy,
@@ -551,10 +618,11 @@ $(document).ready(function ()
                 //color_case = color_neutral_nokd;
                 $(citynames[i]).css('color', color_neutral_nokd);
                 city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                .html('<br><br><br>' + race + ruler_name)
+                .html(race + ruler_name)
                 .css({
                     'width' : '100px',
                     'height' : '20px',
+                    'margin-top' : '3em',
                     'text-decoration' : 'none',
                     'cursor' : 'default',
                     'color' : color_neutral_nokd,
@@ -617,6 +685,8 @@ $(document).ready(function ()
             .appendTo('head');
         });
         
+        
+        
         $('a[href*="reportmessage"]').after(' &nbsp <a href="#reply" onclick="javascript: reply(this);">Quote</a>');
         
     } //topics in subforum
@@ -634,7 +704,7 @@ $(document).ready(function ()
             replies = parseInt(topics.eq(i).find('td.ljus').eq(0).text())+1;
             pages = Math.ceil(replies/50);
             thread_a = topics.eq(i).find('td.mork a.f.v');
-            if (thread_a.attr('href') == undefined)
+            if (thread_a.attr('href') === undefined)
                 thread_a = topics.eq(i).find('td.mork a.f');
             thread_url = thread_a.attr('href');
             new_posts = thread_url.indexOf('#new');
@@ -666,7 +736,7 @@ $(document).ready(function ()
     if (url.indexOf('production.asp') != -1)
     {
         $('#main').css('max-width', '900px').css('*width', '900px'); //568px //.css('width', '900px')
-        $('table').get(0).innerHTML = $('table').get(0).innerHTML.replace(/<!--/g, '').replace(/-->/g, '').replace(/\?city=/g, '?cityID=').replace(/<font class="minus">Nothing<\/font>/g, '').replace(/\s*&\s*[0-9]+ wall/g, ''); //.replace(/ & /g, '').replace(/<\/a>\s*([0-9]+) wall\s*/g, '</a> & $1 wall').replace(/wall/g, 'walls').replace(/1 walls/g, '1 wall');
+        $('table').html($('table').html().replace(/<!--/g, '').replace(/-->/g, '').replace(/\?city=/g, '?cityID=').replace(/<font class="minus">Nothing<\/font>/g, '').replace(/\s*&\s*[0-9]+ wall/g, '')); //.replace(/ & /g, '').replace(/<\/a>\s*([0-9]+) wall\s*/g, '</a> & $1 wall').replace(/wall/g, 'walls').replace(/1 walls/g, '1 wall');
         var row_len = $('table tr').length;
         var col_len = $('table tr th').length;
         
@@ -681,14 +751,14 @@ $(document).ready(function ()
             }*/
             var cols;
             if (start_row == end_row)
-                end_row++
+                end_row++;
             
             for (i = start_row; i < end_row; i++)
             {
                 cols = rows.eq(i).children('th, td');
                 cols.eq(from_col).detach().insertBefore(cols.eq(to_col));
             }
-        }
+        };
         $.moveColumn($('table'), 1, 10, 0, row_len-4);
         $.moveColumn($('table'), 1, 10, 0, row_len-4);
         $.moveColumn($('table'), 1, 10, 0, row_len-4);
@@ -721,40 +791,150 @@ $(document).ready(function ()
     
     if (url.indexOf('train.asp') != -1)
     {
-        var human = ($('#infotext').text().indexOf('Catapults') != -1);
-
+        text_info = $('#infotext');
+        var human = (text_info.text().indexOf('Catapults') != -1);
+        var top_train_button;
+        var top_mob_button;
+        var top_train_table;
+        var top_train_row;
+        
+        var mobilize = false;
         if (human)
         {
-            var mobilize = false;
-            if ($('a[href^=mobilize]').text().indexOf('Mobilize') == -1)
+            top_train_table = $('<table></table>')
+            .attr('class', 'nostyle')
+            .css('width', '100%');
+            $('form').prepend(top_train_table);
+
+            top_train_button = $('.button.big.city:eq(1)').clone();
+            top_mob_button = $('.button.big.city:eq(0)').detach();
+            
+            top_train_row = $('<tr></tr>');
+            top_train_table.append(top_train_row);
+            top_train_row.append($('<td></td>').css('width', '67%').append(top_mob_button), $('<td></td>').css('width', '33%').append(top_train_button));
+            $('form').prev().remove(); //removes <br>
+            $('form').prev().remove(); //removes <br>
+            //top_train_table.after('<br>');
+            
+            if ($('.button.big.city:eq(0)').text().indexOf('Mobilize') == -1)
             {
                 mobilize = true;
-                $('a[href^=mobilize]').attr('title', 'When mobilized, troops in training will be trained double as fast, but at a total loss of about 4% of them.\nMobilization training times are shown in red below, and normal training time in gray.');
-                $('a[href^=mobilize]').after('<br><span style="color:red;"><span style="font-weight:bold; text-decoration:underline;">Troops are Mobilized!</span><br>Losing about 4% troops that get trained each day!</span><br>While Mobilized, troops are trained at the rate of 2 days in 1 day.');
+                $('.button.big.city:eq(0)').attr('title', 'When mobilized, troops in training will be trained double as fast, but at a total loss of about 4% of them.\nMobilization training times are shown in red below, and normal training time in gray.');
+                top_train_table.before('<span style="color:red;"><span style="font-weight:bold; text-decoration:underline;">Troops are Mobilized!</span><br>Losing about 4% troops that get trained each day!</span><br>While Mobilized, troops are trained at the rate of 2 days in 1 day.<br>');
                 $('#main > table:last-of-type').before('<span style="color:red;"><span style="font-weight:bold; text-decoration:underline;">Troops are Mobilized!</span><br>Losing about 4% troops that get trained each day!</span><br>While Mobilized, troops are trained at the rate of 2 days in 1 day.');
             }
             else
             {
-                $('a[href^=mobilize]').attr('title', 'Troops already in training will be trained double as fast, but at a total loss of about 4% of them.\nMobilization training times are shown in red below, and normal training time in gray.');   
+                $('.button.big.city:eq(0)').attr('title', 'Troops already in training will be trained double as fast, but at a total loss of about 4% of them.\nMobilization training times are shown in red below, and normal training time in gray.');   
+            }
+        }
+        else
+        {
+            top_train_table = $('<table></table>')
+            .attr('class', 'nostyle')
+            .css('width', '100%');
+            $('form').prepend(top_train_table);
+            
+            top_train_button = $('.button.big.city:eq(1)').clone();
+            
+            top_train_row = $('<tr></tr>');
+            top_train_table.append(top_train_row);
+            top_train_row.append($('<td></td>').css('width', '67%'), $('<td></td>').css('width', '33%').append(top_train_button));
+            $('form').prev().remove(); //removes <br>
+            $('form').prev().remove(); //removes <br>
+        }
+        top_train_row.after("<tr><td style='text-align:right; font-weight:bold;'>Total training cost:</td><td style='text-align:center;'><span id='total_training_costs'>0</span> gold</td></tr>");
+        $('form table:last-child').before("<table class='nostyle' style='width:100%'><tr><td style='text-align:right; font-weight:bold; width:66%;'>Total training cost:</td><td style='text-align:center; width:33%;'><span id='total_training_costs2'>0</span> gold</td></tr></table>");
+        //maybe add total number of troops here
+        //maybe add option to split units between one and mus: "Split population between training unit tx and MU."
+        
+        text_info = text_info.clone();
+        text_info.find('ul').remove();
+        text_info = text_info.html().replace(/[^0-9 ]+/g, '').replace(/[ ]+/g, ' ').trim().split(' ');
+        if (text_info.length != 6)
+        {
+            alert('train window number mismatch, data array length (is not 10): ' + (text_info.length).toString() + ' array: ' + text_info.join(', '));
+        }
+
+        var c_t = [];
+        $.each(text_info, function(i) {
+            c_t[i] = parseInt(text_info[i]);
+        });
+        var c_trainable = c_t[5];
+        //var c_mu = c_t[3];
+        var c_max_t_trainable = -1;
+
+        var train_el;
+        var train_input;
+        var train_max_button;
+        var train_id;
+        var training_time = -1;
+        var mtime = -1;
+        var training_t_gold = -1;
+        var training_t_gold_total = -1;
+        var brr;
+        var train_cost_span;
+
+        
+        for (i = 0; i < 5; i++)
+        {
+            train_el = $('form table:eq(' + (i + 1) + ') tr:eq(3) td:eq(2)');
+            training_time = train_el.text().match(/\(([0-9]+) days\)/)[1];
+            mtime = Math.ceil(parseInt(training_time)/2);
+            if (human && mobilize)
+            {
+                train_el.html(train_el.html().replace(/\(([0-9]+) days\)/, '(<span style="color:red;">' + mtime.toString() + '</span>/$1 days)'));
+            }
+            else if (human)
+            {
+                train_el.html(train_el.html() + '<br>(<span style="color:red;">' + mtime.toString() + '</span> mobilized)');
             }
 
-            var train_el = '';
-            var training_time = -1;
-            var mtime = -1;
-            for (i = 0; i < 5; i++)
-            {
-                var train_el = $('form table:eq(' + i + ') tr:eq(3) td:eq(2)').get(0);
-                training_time = train_el.innerHTML.match(/\(([0-9]+) days\)/)[1];
-                mtime = Math.ceil(parseInt(training_time)/2);
-                if (mobilize)
-                {
-                    train_el.innerHTML = train_el.innerHTML.replace(/\(([0-9]+) days\)/, '(<span style="color:red;">' + mtime.toString() + '</span>/$1 days)');
-                }
-                else
-                {
-                    train_el.innerHTML = train_el.innerHTML + '<br>(<span style="color:red;">' + mtime.toString() + '</span> mobilized)';
-                }
-            }
+            c_max_t_trainable = Math.min(c_t[i], c_trainable);
+            training_t_gold = parseInt($('form table:eq(' + (i + 1) + ') tr:eq(6) td:eq(1)').text().replace(/[^0-9&]/g, ''));
+               train_input = train_el.find('input');
+            train_id = 't' + (i + 1).toString();
+            train_input.attr('id', train_id)
+            .attr('onkeyup', "\
+                this.value = Math.min(this.value, " + c_max_t_trainable + "); \
+                if (this.value == " + c_max_t_trainable + ") \
+                { \
+                    document.getElementById('" + train_id + "_button').innerHTML = 'Clear'; \
+                } \
+                else \
+                { \
+                    document.getElementById('" + train_id + "_button').innerHTML = 'Max'; \
+                } \
+                document.getElementById('" + train_id + "_total_cost').innerHTML = numberWithCommasx(this.value*" + training_t_gold.toString() + "); sum_training_gold_cost();");
+
+            
+            brr = $('<br>');
+            train_input.after(brr);
+            train_cost_span = $('<span></span>')
+            .attr('id', train_id + '_total_cost')
+            .text('0');
+            brr.after(train_cost_span);
+            train_cost_span.after(' gold');
+            train_max_button = $('<button></button>')
+            .text('Max')
+            .attr('class', 'button')
+            .attr('type', 'button')
+            .attr('id', train_id + '_button')
+            .attr('onclick', "\
+                if (!(document.getElementById('" + train_id + "').value == '" + c_max_t_trainable.toString() + "')) { \
+                    document.getElementById('" + train_id + "').value = '" + c_max_t_trainable.toString() + "'; \
+                    document.getElementById('" + train_id + "_total_cost').innerHTML = numberWithCommasx(" + (c_max_t_trainable*training_t_gold).toString() + "); \
+                    this.innerHTML = 'Clear'; \
+                sum_training_gold_cost(); \
+                } \
+                else \
+                { \
+                    document.getElementById('" + train_id + "').value = ''; \
+                    document.getElementById('" + train_id + "_total_cost').innerHTML = '0'; \
+                    this.innerHTML = 'Max'; \
+                sum_training_gold_cost(); \
+                }");
+            train_input.after(train_max_button);
         }
     }
     
@@ -834,9 +1014,9 @@ $(document).ready(function ()
         }
         var resource_jobs_unfilled = 0;
         resource_jobs_unfilled = productivity_title.replace(/[^0-9]+/g, '');
-        resource_jobs_unfilled = (resource_jobs_unfilled == '') ? 0 : parseInt(resource_jobs_unfilled);
+        resource_jobs_unfilled = (resource_jobs_unfilled === '') ? 0 : parseInt(resource_jobs_unfilled);
         
-        var buildings_info = $('script:eq(1)').get(0).innerHTML.replace(/<!--/g, '').replace(/-->/g, '');
+        var buildings_info = $('script:eq(1)').html().replace(/<!--/g, '').replace(/-->/g, '');
         eval(buildings_info); //replace this with some form of window[var_name] = var_value;
         /*
         b0 - Wreckages
@@ -864,9 +1044,9 @@ $(document).ready(function ()
         var total_resource_buildings = b2 + b3 + b7;
         var total_buildings = b1 + b2 + b3 + b4 + b5 + b6 + b7 + b8 + b9;
         var total_buildings_in_construction = b1i + b2i + b3i + b4i + b5i + b6i + b7i + b8i + b9i;
-        var total_job_buildings = total_buildings - b1;
+        //var total_job_buildings = total_buildings - b1;
         
-        var resources_info = $('script:eq(4)').get(0).innerHTML;
+        var resources_info = $('script:eq(4)').html();
         resources_info = resources_info.replace(/[^0-9&]/g, '');
         resources_info = resources_info.split("&");
         resources_info.pop();
@@ -876,10 +1056,10 @@ $(document).ready(function ()
             window[resources_names[i]] = parseInt(resources_info[i]);
         });
         
-        var text_info = $('#infotext');
+        text_info = $('#infotext');
         text_info = text_info.clone();
         text_info.find('ul').remove();
-        text_info = text_info.get(0).innerHTML.replace(/[^0-9 ]+/g, '').replace(/[ ]+/g, ' ').trim().split(' ');
+        text_info = text_info.html().replace(/[^0-9 ]+/g, '').replace(/[ ]+/g, ' ').trim().split(' ');
         if (text_info.length == 9) //build info with all peasants employed
         {
             text_info.splice(1, 0, '0');
@@ -909,7 +1089,7 @@ $(document).ready(function ()
         
         //var c_slave_build_time = Math.ceil(c_build_time/2);
 
-        var total_jobs = total_job_buildings*5;
+        //total_jobs = total_job_buildings*5;
         var resource_jobs = total_resource_buildings*5;
         
         var total_jobs_unfilled = 0;
@@ -917,7 +1097,7 @@ $(document).ready(function ()
         if (total_jobs_unfilled < 0)
             total_jobs_unfilled = 0;
 
-        if (resource_jobs_unfilled == 0)
+        if (resource_jobs_unfilled === 0)
         {
             resource_jobs_unfilled = resource_jobs - (c_peasants + slaves_used);
             if (resource_jobs_unfilled < 0)
@@ -973,17 +1153,17 @@ $(document).ready(function ()
         var productivity_info = $('table:eq(0) tr:eq(1) td:eq(2)');
         var productivity = parseInt(productivity_info.text());
         // fix this to remove the extensions from towns with no resource_jobs, and fix the title
-        var productivity_percent_real = (resource_jobs == 0) ? 100 : Math.round((resource_jobs - resource_jobs_unfilled)*100/resource_jobs);
-        var productivity_percent_peasants = (resource_jobs == 0) ? 0 : Math.round(c_peasants*100/resource_jobs); //can be over 100%
-        var productivity_percent_slaves = (resource_jobs == 0) ? 0 : Math.round(slaves_used*100/resource_jobs);
+        var productivity_percent_real = (resource_jobs === 0) ? 100 : Math.round((resource_jobs - resource_jobs_unfilled)*100/resource_jobs);
+        var productivity_percent_peasants = (resource_jobs === 0) ? 0 : Math.round(c_peasants*100/resource_jobs); //can be over 100%
+        var productivity_percent_slaves = (resource_jobs === 0) ? 0 : Math.round(slaves_used*100/resource_jobs);
         productivity_info.html(productivity_info.html() + '/<span title="Productivity due to ' + numberWithCommas(slaves_used + c_peasants) + ' peasants and slaves.">' + productivity_percent_real.toString() + '%</span><br><span style="font-size:small;"><span title="Productivity due to ' + numberWithCommas(c_peasants) + ' peasants.">' +
         productivity_percent_peasants.toString() + '%</span> + <span title="Productivity due to ' + numberWithCommas(slaves_used) + ' slaves.">' + productivity_percent_slaves.toString() + '%</span></span>');
         
         
         
-        
-        //$('#infotext').get(0).innerHTML = numberWithCommas($('#infotext').get(0).innerHTML);
-        
+        //$('#infotext').wrap('<span style="pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; -o-user-select: none; user-select: none;"></span>');
+        //$('#infotext').html(numberWithCommas_unselectable($('#infotext').html()));
+        //$('#infotext').after('dfgdf<span class="nonselectable"> sdfsf 1253434 sdf23423432gd</span>dfgdg');
         
         
         //formula for max buildings buildable ==> (c_num_buildable+total_buildings_in_construction)/total_buildings ~= 2.04
@@ -1032,18 +1212,31 @@ $(document).ready(function ()
               //{
    //have to think which is more reliable probably the second one by far, but the second one is definitely faster and more elegant; if you do this, turn ci_user_kds on again
 
+//map: mark your army if it's prepping. make all prepping borders be 1px instead of 2, but still red.
+//map, private version: https://addons.mozilla.org/en-us/firefox/addon/check4change/ for monitoring armies and stuff that can change, and bind it to a sound alarm
+//map: give alert or info about big (moving or not) armies
+//army: add input military sci level. then calculate the army mop/mdp. if military sci not entered, show raw numbers.
+//map: army: make the army size indicators link to the army as well. like the XXXX
+//add a refresh page (whole page, not just a frame) button just right to the clock. http://stackoverflow.com/questions/5404839/how-can-i-refresh-a-page-with-jquery
+//forum: if you paste a table, it adds breadcrumbs after the first row (or before the last, dunno), as well as normally at the end of all posts.
+//link all of the frames variables, etc. (probably would require working in the main, and accesing the frames by something like frame[i].prop...)
+//recolor minimap accoring to relations. add armies. will have to wait until all frames are linked. ^^^^
+//when creating an army/city, add a note that 1 and 2 letter words are removed, and any extra space is turned to one space, and the result is trimmed on both sides
 //build page: add number of resource jobs in some of the titles, eg. prod% 
 //build page: remove the extensions from towns with no resource_jobs, and fix the title
 //build page: reconstruct productivity, so the current%/total% is all wrapped up in the span, so all is red, and all has the same title. then the titles includes unfilled jobs (+plus up/down/stable) and peasants + slaves working numbers. and add numberWithCommas to numbers.
 //build page: indicate that productivity depends on resources jobs, not total jobs, filled with peasants and slaves. but tax depends on total jobs filled by peasants.
 //every popup window: add underdotted to every element that has a title
 // replace .replace(/[^0-9]+/g, '') with a new method called .stripNonNum(optional delimiter), where if delimiter != undefined then get all numbers and return them as a delimited string
+//map: fix cities breaking click-drag scrolling.
 //map: click on waypoint opens waypoints
 //map: add city name to title
 //map: make the border of tier 3 fast armies thicker, or red, or make that army stand out somehow
 //map: z-order of self army vs other armies, vs army names, vs city names... also, see what the march button does in terms of js to put armies on top of others (for non-orcs)
 //map: when hovering over a city, show line of sight distance according to city size (does this matter?), gt. use the intern function to draw the fog of war limit, or use a circle. terrain?
 //map: when hovering over an army, show line of sight distance. use the intern function to draw the fog of war limit, or use a circle. terrain?
+//map: when selecting move destination of an army, make it clickable anywhere (on top of other armies). z-order collision?
+//map: untangle stacked armies: when an army is chosen from the dropdown menu: calculate all armies in range (or find function in game js). make a button that either: cycles trough the armies and makes the current one's z-order higher, and other armies default. OR make it pop out a div with clones of all those armies' inside (except don't clone ID). also put them above your own. in case you moved over allied armies and can't click on them.
 //hide/remove some waypoints (from kd page list and from map)
 //add extra X or some other sign like for armies of the last size, or two rows, one with 3X and the other with 2X
 //wut, opens when you click on the KD button: http://visual-utopia.com/forum.asp?f=Childrens%20Playground&t=Battle%20Reports&replies=42
