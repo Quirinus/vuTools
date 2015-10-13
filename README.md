@@ -12,8 +12,10 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - all names (except waypoints) have an an outline around them for easier spotting
 
 ######Build window:
-- added Tax% to the top, mouseover to see numbers
-- Prod% expanded with: real total prod., peasant and slave productivity. mouseover to see numbers
+- added Tax% to the top; mouseover to see numbers
+- added Pop%, with peasant and army pop%; mouseover them
+- Prod% expanded with: real total prod., peasant and slave productivity; mouseover to see numbers
+- everything that is underdotted has mouseover titles that give additional info
 
 ######Kingdom window:
 - added list other kds button under players list
