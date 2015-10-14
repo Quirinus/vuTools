@@ -1,3 +1,4 @@
+- build: building numbers --> thousands separators
 - map: link arrows to armies, and size signs also
 - map: https://static.visual-utopia.com/terrain8.js could be used to check for city sizes before planting them, but I won't do that it since it's a premium feature.
 - forum: replies might be broken when the number indicates a post not on the last page.

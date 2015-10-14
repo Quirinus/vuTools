@@ -1,16 +1,18 @@
 # vuTools <sub><sup>(v0.21)</sup></sub>
 A userscript to improve various user interface bits of the Visual Utopia browser game.
 
-![Relation colors, army/city race & owner, additional army tooltip info](https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools_screenshot.png "Relation colors, army/city race & owner, additional army tooltip info")
+![Shows different relation colors, army/city race & owner, additional army tooltip info](https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools_screenshot.png "Relation colors, army/city race & owner, additional army tooltip info")
 
 ### Features
+- automatically checks for updates
+
 ######Map:
 - all armies and cities have **[race]short_player_name** under them (the ones on armies are clickable)
 - armies display number of troops when you hover over them
 - armies display if they have only tier 3 troops and movement bonus if you hover over them
 - cities display the number of guardtowers up to 2,000 when you hover over them
 - city and army (ruler) names colored according to kd relations:
- - self, own kd, friendly kd, neutral kd, neutral no kd, enemy kd
+ - self, own kd, friendly kd, neutral no kd, neutral kd, enemy kd
 - army size indicators, movement direction arrow and army path are white
 - all names (except waypoints) have an an outline around them for easier spotting
 

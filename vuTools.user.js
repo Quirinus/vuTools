@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         vuTools
-// @version      0.21
+// @version      0.22
 // @author       Ivan Jelenić (Quirinus)
 // @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
 // @homepage     https://github.com/Quirinus/
@@ -452,7 +452,6 @@ $(document).ready(function ()
             //ci_user_kdIDs[i] = city_info[7];
         }
         var cityID_check_index = -1;
-
         
         //enableDrag(obj)
         
@@ -472,42 +471,42 @@ $(document).ready(function ()
             {
                 city_gts = ci_city_gts[i] + ' guardtowers.';
             }
-            title = numberWithCommas($(citynames[i]).attr('title'));
-            title = title + ' ' + city_gts;
-            title = title.replace(': ', ':\r');
-            $(citynames[i]).attr('title', title);
+            title = $(citynames[i]).attr('title');
             city_name = citynames[i].innerHTML;
             city_ID = $(citynames[i]).attr('onclick').replace("pop('cityInfoE.asp?cityID=", '').replace("')", '');
 
-            name_separator_pos1 = title.indexOf(' city owned by ');
-            race = title.substring(0, name_separator_pos1);
-            race = '[' + race.substr(0,2) + ']';
-            name_separator_pos2 = title.indexOf(' of ');
-            name_separator_pos3 = title.indexOf(': ');
-            
-            if (name_separator_pos2 !== -1)
+            ruler_name = '';
+            if (title.indexOf('Your city:') === -1)
             {
-                cityID_check_index = ci_cityIDs.indexOf(city_ID);
-                if (cityID_check_index !== -1)
+                name_separator_pos1 = title.indexOf(' city owned by ');
+                race = title.substring(0, name_separator_pos1);
+                race = '[' + race.substr(0,2) + ']';
+                name_separator_pos2 = title.indexOf(' of ');
+                name_separator_pos3 = title.indexOf(':');
+
+
+                if (name_separator_pos2 !== -1)
                 {
-                    ruler_name = ci_users[cityID_check_index];
-                    //kd_name = ci_user_kds[cityID_check_index];
+                    cityID_check_index = ci_cityIDs.indexOf(city_ID);
+                    if (cityID_check_index !== -1)
+                    {
+                        ruler_name = ci_users[cityID_check_index];
+                        //kd_name = ci_user_kds[cityID_check_index];
+                    }
+                    else
+                    {
+                        //error,try to do it with the classic method that may fail in complicated cases and give wrong user/kd name cutoffs
+                        ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos2);
+                        //kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3);
+                    }
                 }
                 else
                 {
-                    //error,try to do it with the classic method that may fail in complicated cases and give wrong user/kd name cutoffs
-                    ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos2);
-                    //kd_name = title.substring(name_separator_pos2 + ' of '.length, name_separator_pos3);
+                    ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos3);
+                    //kd_name = '';
                 }
-
             }
-            else
-            {
-                ruler_name = title.substring(name_separator_pos1 + ' city owned by '.length, name_separator_pos3);
-                //kd_name = '';
-            }
-            
-            
+             
             
             
             for (j = 0; j < titles_len; j++)
@@ -533,6 +532,12 @@ $(document).ready(function ()
                 'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
                 '-webkit-font-smoothing' : 'antialiased'
             });
+            
+            title = numberWithCommas(title);
+            title = title + ' ' + city_gts;
+            title = title.replace(': ', ':\r');
+            $(citynames[i]).attr('title', title);
+            
             
             //color_case = '';
             if (title.indexOf('Your city:') !== -1)
