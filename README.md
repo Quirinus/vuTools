@@ -1,5 +1,8 @@
-# vuTools
+# vuTools <sub><sup>(v0.21)</sup></sub>
 A userscript to improve various user interface bits of the Visual Utopia browser game.
+
+![Relation colors, army/city race & owner, additional army tooltip info](https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools_screenshot.png "Relation colors, army/city race & owner, additional army tooltip info")
+
 ### Features
 ######Map:
 - all armies and cities have **[race]short_player_name** under them (the ones on armies are clickable)
