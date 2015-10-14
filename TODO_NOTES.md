@@ -1,8 +1,10 @@
 
-
-
-
-
+- change VU Tools.user.js --> vuTools.user.js, and in the script meta as well, and in the update link
+- building: 1/6 and 5/6 split button
+- building/training: when you click on max, clear all the rest
+- building: #maxuseslaves commas
+- building: hide only 0 buildings, except 0 & 1 GT. show the rest.
+- building/training: add "Total troops/buildings:" to the left of "Total training/building (gold) cost:"
 - building: turn slave table into a form. slave number into an input. another input for adding/removing slaves (submits both main and this input), and for entering the amount of slaves to release (produce a prompt before releasing, saying the possible outcome). ?
 - training: maybe add total number of troops close to total gold for all tiers, or total op/dp/mu done and in training
 - training: maybe add option to split units between one and mus: "Split remaining population between training unit tx and MU." (only available when you can train all peasants)

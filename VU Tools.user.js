@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         VU Tools
-// @version      0.13
+// @name         vuTools
+// @version      0.2
 // @author       Ivan Jelenić (Quirinus)
 // @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
 // @homepage     https://github.com/Quirinus/
@@ -12,6 +12,8 @@
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js
 // @grant        none
 // ==/UserScript==
+
+//update url: https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools.user.js
 
 $(document).ready(function ()
 {
@@ -71,14 +73,36 @@ $(document).ready(function ()
         .text("function sum_training_gold_cost() \
         { \
             var sum = \
-                parseInt((document.getElementById('t1_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')) + \
-                parseInt((document.getElementById('t2_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')) + \
-                parseInt((document.getElementById('t3_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')) + \
-                parseInt((document.getElementById('t4_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')) + \
-                parseInt((document.getElementById('t5_total_cost').innerHTML).replace(/[^0-9 ]+/g, '')); \
+                parseInt((document.getElementById('t1_total_cost').innerHTML).replace(/[^0-9]+/g, '')) + \
+                parseInt((document.getElementById('t2_total_cost').innerHTML).replace(/[^0-9]+/g, '')) + \
+                parseInt((document.getElementById('t3_total_cost').innerHTML).replace(/[^0-9]+/g, '')) + \
+                parseInt((document.getElementById('t4_total_cost').innerHTML).replace(/[^0-9]+/g, '')) + \
+                parseInt((document.getElementById('t5_total_cost').innerHTML).replace(/[^0-9]+/g, '')); \
                 document.getElementById('total_training_costs').innerHTML = numberWithCommasx(sum); \
                 document.getElementById('total_training_costs2').innerHTML = numberWithCommasx(sum); \
         }")
+        .appendTo('head');
+    });
+    
+    $(function () { //a clone for the page, not this script
+        $('<script>')
+        .attr('type', 'text/javascript')
+        .text("function sum_building_gold_cost() \
+        { \
+            var sum = \
+                parseInt((document.getElementById('b_1_total_cost').innerHTML).replace(/[^0-9]+/g, '')) + \
+                parseInt((document.getElementById('b_2_total_cost').innerHTML).replace(/[^0-9]+/g, '')) + \
+                parseInt((document.getElementById('b_3_total_cost').innerHTML).replace(/[^0-9]+/g, '')) + \
+                parseInt((document.getElementById('b_4_total_cost').innerHTML).replace(/[^0-9]+/g, '')) + \
+                parseInt((document.getElementById('b_5_total_cost').innerHTML).replace(/[^0-9]+/g, '')); \
+                parseInt((document.getElementById('b_6_total_cost').innerHTML).replace(/[^0-9]+/g, '')); \
+                parseInt((document.getElementById('b_7_total_cost').innerHTML).replace(/[^0-9]+/g, '')); \
+                parseInt((document.getElementById('b_8_total_cost').innerHTML).replace(/[^0-9]+/g, '')); \
+                parseInt((document.getElementById('b_9_total_cost').innerHTML).replace(/[^0-9]+/g, '')); \
+                parseInt((document.getElementById('b_wall_total_cost').innerHTML).replace(/[^0-9]+/g, '')); \
+                document.getElementById('total_building_costs').innerHTML = numberWithCommasx(sum); \
+                document.getElementById('total_building_costs2').innerHTML = numberWithCommasx(sum); \
+         }")
         .appendTo('head');
     });
     
@@ -202,7 +226,7 @@ $(document).ready(function ()
             if (ai_troops[i] == '1 troops')
                 ai_troops[i] = '1 soldier';
             ai_t3[i] = (army_info[14] == '0') ? '' : '\nOnly tier 3 troops - movement bonus.';
-            if (army_info[10] == '')
+            if (army_info[10] === '')
             {
                 ai_user_kds[i] = '';
             }
@@ -306,7 +330,7 @@ $(document).ready(function ()
             army_ruler_name_short = army_ruler_name;
             for (j = 0; j < titles_len; j++)
             {
-                if (army_ruler_name_short.indexOf(titles_trim[j]) == 0)
+                if (army_ruler_name_short.indexOf(titles_trim[j]) === 0)
                 {
                     army_ruler_name_short = army_ruler_name_short.slice(titles_trim[j].length);
                     break;
@@ -892,7 +916,7 @@ $(document).ready(function ()
         
         for (i = 0; i < 5; i++)
         {
-            train_el = $('form table:eq(' + (i + 1) + ') tr:eq(3) td:eq(2)');
+            train_el = $('form table:eq(' + (i + 1).toString() + ') tr:eq(3) td:eq(2)');
             training_time = train_el.text().match(/\(([0-9]+) days\)/)[1];
             mtime = Math.ceil(parseInt(training_time)/2);
             if (human && mobilize)
@@ -905,12 +929,14 @@ $(document).ready(function ()
             }
 
             c_max_t_trainable = Math.min(c_t[i], c_trainable);
-            training_t_gold = parseInt($('form table:eq(' + (i + 1) + ') tr:eq(6) td:eq(1)').text().replace(/[^0-9&]/g, ''));
-               train_input = train_el.find('input');
+            training_t_gold = parseInt($('form table:eq(' + (i + 1).toString() + ') tr:eq(6) td:eq(1)').text().replace(/[^0-9&]/g, ''));
+            train_input = train_el.find('input');
             train_id = 't' + (i + 1).toString();
             train_input.attr('id', train_id)
-            .attr('onkeyup', "\
-                this.value = Math.min(this.value, " + c_max_t_trainable + "); \
+            .attr('onkeyup', 
+                "this.value = Math.min(this.value, " + c_max_t_trainable + "); \
+                if (this.value === '0') \
+                    this.value = ''; \
                 if (this.value == " + c_max_t_trainable + ") \
                 { \
                     document.getElementById('" + train_id + "_button').innerHTML = 'Clear'; \
@@ -934,8 +960,8 @@ $(document).ready(function ()
             .attr('class', 'button')
             .attr('type', 'button')
             .attr('id', train_id + '_button')
-            .attr('onclick', "\
-                if (!(document.getElementById('" + train_id + "').value == '" + c_max_t_trainable.toString() + "')) { \
+            .attr('onclick', 
+                "if (!(document.getElementById('" + train_id + "').value == '" + c_max_t_trainable.toString() + "')) { \
                     document.getElementById('" + train_id + "').value = '" + c_max_t_trainable.toString() + "'; \
                     document.getElementById('" + train_id + "_total_cost').innerHTML = numberWithCommasx(" + (c_max_t_trainable*training_t_gold).toString() + "); \
                     this.innerHTML = 'Clear'; \
@@ -950,6 +976,7 @@ $(document).ready(function ()
                 }");
             train_input.after(train_max_button);
         }
+        $('#infotext').html(numberWithCommas($('#infotext').html()));
     }
     
     if (url.indexOf('kingdom.asp?list=otherkingdoms') != -1)
@@ -1154,9 +1181,12 @@ $(document).ready(function ()
             else
                 slaves_add_remove = slaves_missing;
         }   
-        $('button.slaves:eq(0)').attr('onclick', 'addSlaves("' + slaves_add_remove.toString() + '", "' + cityID.toString() + '", "' + cityName.toString() + '")');
-        $('table:eq(1) tr:eq(1) td:eq(1)').html(numberWithCommas($('table:eq(1) tr:eq(1) td:eq(1)').html().trim()) + ' <span style="font-weight:bold;">/</span> <span title="The amount of slaves needed for 100% production." class="underdotted">' + numberWithCommas(slaves_used + slaves_add_remove));
         
+        if (slaves_used !== 0 || (slaves_missing !== 0 && g_slaves !== 0))
+        {
+            $('button.slaves:eq(0)').attr('onclick', 'addSlaves("' + slaves_add_remove.toString() + '", "' + cityID.toString() + '", "' + cityName.toString() + '")');
+            $('table:eq(1) tr:eq(1) td:eq(1)').html(numberWithCommas($('table:eq(1) tr:eq(1) td:eq(1)').html().trim()) + ' <span style="font-weight:bold;">/</span> <span title="The amount of slaves needed for 100% production." class="underdotted">' + numberWithCommas(slaves_used + slaves_add_remove));
+        }
         
         
         /*
@@ -1211,8 +1241,110 @@ $(document).ready(function ()
             $('table:eq(0) tr:eq(1) td:eq(1)').after('<td class="big" title="There are jobs not filled by peasants.\nGet ' + numberWithCommas(tax_jobs_unfilled) + ' more peasants to generate maximum tax."><span class="underdotted">' + tax_percent.toString() + '%</span></td>');
         }
         
+        
+        var build_input;
+        var build_max_button;
+        var build_id;
+        var building_gold_total = -1;
+        var building_wood_total = -1;
+        var building_stone_total = -1;
+        var bbrr;
+        var build_cost_gold_span;
+        var build_cost_wood_span;
+        var build_cost_stone_span;
+        var top_build_table;
+        var top_build_button;
+        var top_build_row;
+        var buildable_b;
+        
+        for (i = 1; i < 11; i++)
+        {
+            //c_build_time;
+            //c_build_space_left, c_num_buildable, c_num_buildable_walls, max_buildings_capacity
+            //c_build_cost_gold, c_build_cost_tree, c_build_cost_stone, c_build_cost_stone_wall
+            build_input = $('form table:eq(' + (i - 1).toString() + ') input');
+            if (i != 10)
+            {
+                buildable_b = c_num_buildable;
+                build_id = 'b_' + i.toString();
+            }
+            else
+            {
+                buildable_b = c_num_buildable_walls;
+                build_id = 'b_wall';
+            }
+            
+/*
+//add this before document.getElementById('" + build_id + "_button').innerHTML = 'Clear'; \ that's below
+for (j=1;j<10;j++) { document.getElementById('b_' + j.toString() + '_button').innerHTML = 'Max'; document.getElementById('b_' + j.toString()).innerHTML = ''; } \
+document.getElementById('b_wall_button').innerHTML = 'Max'; document.getElementById('b_wall').innerHTML = '';\
+this.value = " + buildable_b.toString() + "; \
+*/
+            build_input.attr('id', build_id)
+            .attr('onkeyup', 
+                "this.value = Math.min(this.value, " + buildable_b.toString() + "); \
+                sumBuild(); \
+                if (this.value === '0') \
+                    this.value = ''; \
+                if (this.value == " + buildable_b.toString() + ") \
+                { \
+                    document.getElementById('" + build_id + "_button').innerHTML = 'Clear'; \
+                } \
+                else \
+                { \
+                    document.getElementById('" + build_id + "_button').innerHTML = 'Max'; \
+                } \
+                document.getElementById('" + build_id + "_total_cost').innerHTML = numberWithCommasx(this.value*" + c_build_cost_gold.toString() + "); sum_building_gold_cost();");
+
+            
+            bbrr = $('<br>');
+            build_input.after(bbrr);
+            build_cost_gold_span = $('<span></span>')
+            .attr('id', build_id + '_total_cost')
+            .text('0');
+            bbrr.after(build_cost_gold_span);
+            build_cost_gold_span.after(' gold');
+            build_max_button = $('<button></button>')
+            .text('Max')
+            .attr('class', 'button')
+            .attr('type', 'button')
+            .attr('id', build_id + '_button')
+            .attr('onclick', 
+                "if (!(document.getElementById('" + build_id + "').value == '" + buildable_b.toString() + "')) { \
+                    document.getElementById('" + build_id + "').value = '" + buildable_b.toString() + "'; \
+                    document.getElementById('" + build_id + "_total_cost').innerHTML = numberWithCommasx(" + (buildable_b*c_build_cost_gold).toString() + "); \
+                    this.innerHTML = 'Clear'; \
+                    sum_building_gold_cost(); \
+                    sumBuild(); \
+                } \
+                else \
+                { \
+                    document.getElementById('" + build_id + "').value = ''; \
+                    document.getElementById('" + build_id + "_total_cost').innerHTML = '0'; \
+                    this.innerHTML = 'Max'; \
+                    sum_building_gold_cost(); \
+                    sumBuild(); \
+                 }");
+            build_input.after(build_max_button);
+        }
+        $('form').prepend("<table class='nostyle' style='width: 100%'><tr><td style='text-align:right; font-weight:bold; width:67%;'>Total building gold cost:</td><td style='text-align:center; width:33%;'><span id='total_building_costs'>0</span> gold</td></tr></table>");
+        $('form table:last-child').before("<table class='nostyle' style='width:100%'><tr><td style='text-align:right; font-weight:bold; width:67%;'>Total building gold cost:</td><td style='text-align:center; width:33%;'><span id='total_building_costs2'>0</span> gold</td></tr></table>");
+        
+        top_build_table = $('<table></table>')
+        .attr('class', 'nostyle')
+        .css('width', '100%');
+        $('form').prepend(top_build_table);
+
+        top_build_button = $('.button.big.build').clone();
+
+        top_build_row = $('<tr></tr>');
+        top_build_table.append(top_build_row);
+        top_build_row.append($('<td></td>').css('width', '67%'), $('<td></td>').css('width', '33%').append(top_build_button));
+        $('form').prev().remove(); //removes <br>
+        $('form').prev().remove(); //removes <br>
+        
         //$('#infotext').wrap('<span style="pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; -o-user-select: none; user-select: none;"></span>');
-        //$('#infotext').html(numberWithCommas_unselectable($('#infotext').html()));
+        $('#infotext').html(numberWithCommas($('#infotext').html()));
         //$('#infotext').after('dfgdf<span class="nonselectable"> sdfsf 1253434 sdf23423432gd</span>dfgdg');
         
         

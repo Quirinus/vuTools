@@ -17,6 +17,12 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - Prod% expanded with: real total prod., peasant and slave productivity; mouseover to see numbers
 - shows optimal slaves number suggestion
 - the optimal amount of slaves to add/remove is automatically entered in the prompt
+- added total building costs, for each building, under it
+- added total gold costs to building all different buildings to top and bottom
+- added Max buttons next to each building type (turns to Clear when max buildable number is in the input box)
+- input box now doesn't allow you to enter more than max amount of buildable units
+- added another build button to the top
+- added thousand separator commas almost everywhere
 - everything that is underdotted has mouseover titles that give additional info
 
 ######Kingdom window:
@@ -42,16 +48,12 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - quote function
 
 ######Training window:
-- added total training costs under tier of units
+- added total training costs, for each tier of unit, under it
 - added total gold costs to train all tier units to top and bottom
 - added Max buttons next to each tier unit (turns to Clear when max trainable number is in the input box)
 - input box now doesn't allow you to enter more than max amount of trainable units
 - added another train button to the top
+- added thousand separator commas almost everywhere
 - for Human players; Mobilization:
  - added training times and warnings
  - changed button title to be more clear
-
-### Coming up
-- City building window automatic number calculations and suggestions
-- Training automatic number filling and costs
-- Improvements in other windows
