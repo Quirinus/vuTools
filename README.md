@@ -1,4 +1,4 @@
-# vuTools <sub><sup>(v0.21)</sup></sub>
+# vuTools <sub><sup>(v0.22)</sup></sub>
 A userscript to improve various user interface bits of the Visual Utopia browser game.
 
 ![Shows different relation colors, army/city race & owner, additional army tooltip info](https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools_screenshot.png "Relation colors, army/city race & owner, additional army tooltip info")
