@@ -36,15 +36,15 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 
 ######Production window:
 - added columns: morale%, productivity%, employement%, population%, land
-(and total land), defense (troops+clickable # of armies)
+(and total land), defense (troops+clickable # of armies and troops)
 - added total tax income and total (mines) gold income
 
 ######Forum:
 - breadcrumbs on the bottom
 - page list on the top
-- last page/post link after the thread name
+- last page/post link after thread names
 - bottom button
-- jumps to reply when opening via blinking kd btn from menu
+- jumps to relevant post when opening via blinking kd button
 - quote function
 
 ######Training window:

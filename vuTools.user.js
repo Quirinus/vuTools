@@ -5,7 +5,7 @@
 // @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
 // @homepage     https://github.com/Quirinus/
 // @namespace    https://github.com/Quirinus/
-// @downloadURL  https://github.com/Quirinus/vuTools/archive/master.zip
+// @downloadURL  https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools.user.js
 // @supportURL   https://github.com/Quirinus/vuTools/issues
 // @icon         http://visual-utopia.com/favicon.ico
 // @match        http://visual-utopia.com/*
@@ -186,7 +186,6 @@ $(document).ready(function ()
         //var army_size_real_numbers = ['(1-5)', '(8-12)', '(20-50)', '(100-300)', '(500-1500)', '(2000-4000)', '(Around 5000)',  '(10,000-20,000)', '(Around 50,000)', '(100,000-200,000)', '(200,000-1,000,000)', 'More then one million soldiers.'];
         
         //here you can access variables under $('script:eq(2)), since they're already loaded
-        
 
         //strArmies
         //gives info about users that have visible armies:
@@ -261,10 +260,10 @@ $(document).ready(function ()
             
             name_separator_pos5 = title.substring(name_separator_pos4 + ' controlled by '.length).indexOf(' of ');
 
-            if (name_separator_pos5 != -1)
+            if (name_separator_pos5 !== -1)
             {
                 armyID_check_index = ai_armyIDs.indexOf(army_ID);
-                if (armyID_check_index != -1)
+                if (armyID_check_index !== -1)
                 {
                     army_ruler_name = ai_users[armyID_check_index];
                     army_kd = ai_user_kds[armyID_check_index];
@@ -284,7 +283,7 @@ $(document).ready(function ()
             else
             {
                 armyID_check_index = ai_armyIDs.indexOf(army_ID);
-                if (armyID_check_index != -1)
+                if (armyID_check_index !== -1)
                 {
                     army_ruler_name = ai_users[armyID_check_index];
                     army_kd = ''; //army_kd = ai_user_kds[armyID_check_index];
@@ -310,19 +309,19 @@ $(document).ready(function ()
             {
                 army_color = color_ownkd;
             }
-            else if (kds_friendly.indexOf(army_kd) != -1)
+            else if (kds_friendly.indexOf(army_kd) !== -1)
             {
                 army_color = color_friendly;
             }
-            else if (kds_neutral.indexOf(army_kd) != -1)
+            else if (kds_neutral.indexOf(army_kd) !== -1)
             {
                 army_color = color_neutral;
             }
-            else if (kds_enemy.indexOf(army_kd) != -1)
+            else if (kds_enemy.indexOf(army_kd) !== -1)
             {
                 army_color = color_enemy;
             }
-            else //if (kds_neutral_nokd.indexOf(army_kd) != -1)
+            else //if (kds_neutral_nokd.indexOf(army_kd) !== -1)
             {
                 army_color = color_neutral_nokd;
             }
@@ -339,10 +338,10 @@ $(document).ready(function ()
             if (army_ruler_name_short.length > 10)
             {
                 ruler_name_space_pos = army_ruler_name_short.indexOf(' ');
-                if (ruler_name_space_pos != -1)
+                if (ruler_name_space_pos !== -1)
                     army_ruler_name_short = army_ruler_name_short.substring(0, ruler_name_space_pos); //add another layer of indexOf(' ') for a short word
                 if (army_ruler_name_short.length > 10)
-                    army_ruler_name_short = army_ruler_name_short.substring(0, 9);
+                    army_ruler_name_short == army_ruler_name_short.substring(0, 9);
             }
 
             
@@ -389,7 +388,7 @@ $(document).ready(function ()
 
             //adds army troop numbers and if they're t3 to title
             army_size_index = army_size_names.indexOf(army_size);
-            if (army_size_index != -1)
+            if (army_size_index !== -1)
             {
                 army_kd = (army_kd !== '') ? 'of ' + army_kd : '';
                 title = army_name + ': '+ army_race + ' ' + army_size + ' (' + army_troops  + ')\n'
@@ -454,6 +453,8 @@ $(document).ready(function ()
         var cityID_check_index = -1;
 
         
+        //enableDrag(obj)
+        
         //cities
         for (i = 0; i < city_len; i++)
         {
@@ -483,10 +484,10 @@ $(document).ready(function ()
             name_separator_pos2 = title.indexOf(' of ');
             name_separator_pos3 = title.indexOf(': ');
             
-            if (name_separator_pos2 != -1)
+            if (name_separator_pos2 !== -1)
             {
                 cityID_check_index = ci_cityIDs.indexOf(city_ID);
-                if (cityID_check_index != -1)
+                if (cityID_check_index !== -1)
                 {
                     ruler_name = ci_users[cityID_check_index];
                     //kd_name = ci_user_kds[cityID_check_index];
@@ -519,7 +520,7 @@ $(document).ready(function ()
             if (ruler_name.length > 10)
             {
                 ruler_name_space_pos = ruler_name.indexOf(' ');
-                if (ruler_name_space_pos != -1)
+                if (ruler_name_space_pos !== -1)
                     ruler_name = ruler_name.substring(0, ruler_name_space_pos);
                 if (ruler_name.length > 10)
                     ruler_name = ruler_name.substring(0, 9);
@@ -689,17 +690,47 @@ $(document).ready(function ()
         //click on the upper menu buttons - popout
         //click on the hidden menu buttons - popout
     
-    //replies when kd button in the menu is blinking
-    if (url.indexOf('&replies=') != -1)
+    //replies when kd button in the menu is blinking. this fixes is to go to the right post...
+    if (url.indexOf('&replies=') !== -1)
     {
         var reply_number = parseInt(url.substring(url.indexOf('&replies=')+'&replies='.length));
-        $("table:nth-of-type(1) tr:eq(" + (reply_number+1).toString() + ")").attr('id','reply_post');
-        window.location.href = '#reply_post'; //fix it not jumping so the id is at the top of the page, there's a small gap
+        var page = Math.ceil((reply_number + 1)/50);
+        var page_navigation = $("a[href='#top']").parent().parent();
+        page_navigation = page_navigation.clone();
+        var current_page = parseInt(page_navigation.find('strong').text());
+        page_navigation.find('b').remove();
+        page_navigation.find('strong').remove();
+        page_navigation.find("a:contains('(next)')").remove();
+        page_navigation.find("a:contains('(back)')").remove();
+        var max_page = Math.max(parseInt(page_navigation.find('a:last-child').text()), current_page);
+        var url_page = url.indexOf('&page=');
+        if (url_page !== -1)
+            url_page = parseInt(url.substring(url_page + '&page='.length));
+        else
+            url_page = max_page;
+        var reply_number_mod = reply_number%50;
+
+        if ((page === current_page) || (page === url_page))
+        {
+            $("#main > table:eq(0) > tbody > tr:eq(" + (reply_number_mod+1).toString() + ")").attr('id','reply_post');
+            window.location.href = '#reply_post'; //fix it not jumping so the id is at the top of the page, there's a small gap
+        }
+        else
+        {
+            if (window.location.href.indexOf('&page=') === -1)
+            {
+                window.open(window.location.href.replace('&replies=', '&page=' + page + '&replies='), '_self');
+            }
+            else
+            {
+                window.open(window.location.href.replace(/\&page=[0-9]+/, '&page=' + page), '_self');
+            }
+        }
         //location.hash = '#reply_post'; <--this one just changes the hash (part including and after #)
-        
         //http://visual-utopia.com/forum.asp?f=Childrens%20Playground&t=Market%20Sales&replies=36#reply_post <--- includes &t=
+        
     } //posts in thread
-    if (url.indexOf('&t=') != -1)
+    if (url.indexOf('&t=') !== -1)
     {
         var breadcrumbs = $('#main > h1:first-child');
         breadcrumbs = breadcrumbs.clone();
@@ -710,10 +741,12 @@ $(document).ready(function ()
         navigation = navigation.clone();
         navigation.find('a[href="#top"]').attr('href','#bottom');
         navigation.find('a[href="#bottom"]').html('Bottom');
-        navigation.prependTo("#main > table:first-of-type");
-        $("table:nth-of-type(2)").before(breadcrumbs);
+        navigation.find('> td').attr('class', 'mork');
+        $("#main > table:first-of-type tr:eq(0)").after(navigation);
+
+        $("#main > table:first-of-type").after(breadcrumbs);
         
-        if ((url.indexOf('#new') == -1) && (url.indexOf('#bottom') != -1))
+        if ((url.indexOf('#new') === -1) && (url.indexOf('#bottom') !== -1))
             navigation.find('a[href="#bottom"]').get(0).click();
         
         //adds quote button
@@ -721,7 +754,7 @@ $(document).ready(function ()
         $(function () {
             $('<script>')
             .attr('type', 'text/javascript')
-            .text('function reply(obj) { var html = obj.parentNode.parentNode.innerHTML; var name = html.substring( html.indexOf("<b>") + 3, html.indexOf("</b>") ); var txt = html.substring( html.indexOf(\'<div class="t">\') + 15, html.indexOf(\'</div><br> <a href="forum.asp?forum=\') ); html = \'<blockquote cite="\' + document.location.href + \'"><b>\' + name +  \':</b>\' + txt  + \'</blockquote><br><br>\'; var iframe = document.getElementsByTagName(\'iframe\')[1]; var doc = iframe.contentWindow.document; doc.body.innerHTML = doc.body.innerHTML + "<br>" + html;}')
+            .text('function reply(obj) { var html = obj.parentNode.parentNode.innerHTML; var name = html.substring( html.indexOf("<b>") + 3, html.indexOf("</b>") ); var txt = html.substring( html.indexOf(\'<div class="t">\') + 15, html.indexOf(\'</div><br> <a href="forum.asp?forum=\') ); html = \'<blockquote cite="\' + document.location.href + \'"><b>\' + name +  \':</b>\' + txt  + \'</blockquote><br><br>\'; var iframe = document.getElementsByTagName(\'iframe\')[1]; var doc = iframe.contentWindow.document; doc.body.innerHTML = doc.body.innerHTML + "<br>" + html; window.location.href = "#bottom";}')
             .appendTo('head');
         });
         
@@ -730,7 +763,7 @@ $(document).ready(function ()
         $('a[href*="reportmessage"]').after(' &nbsp <a href="#reply" onclick="javascript: reply(this);">Quote</a>');
         
     } //topics in subforum
-    else if ((url.indexOf('?f=') != -1) || (url.indexOf('?forum=') != -1))
+    else if ((url.indexOf('?f=') !== -1) || (url.indexOf('?forum=') !== -1))
     {
         var topics = $('#main > table tr:not(:first-child):not(:last-child)');
         var topics_len = topics.length;
@@ -749,7 +782,7 @@ $(document).ready(function ()
             thread_url = thread_a.attr('href');
             new_posts = thread_url.indexOf('#new');
 
-            if (new_posts == -1)
+            if (new_posts === -1)
             {
                 thread_a.after(thread_a.clone().attr('href', thread_url.substring(0,thread_url.length-1) + pages.toString() + '#bottom'));
                 thread_a.next().text(" » ");
@@ -761,19 +794,17 @@ $(document).ready(function ()
             }*/
         }
     } //subforums in main forum
-    else if (url.indexOf('forum.asp') != -1)
+    else if (url.indexOf('forum.asp') !== -1)
     {
         
     }
-    //add: navigation to the top and breadcrumbs to the bottom in the subforums
     //add: in threads / subforum, link to the (last) page, and maybe (first) page
     //maybe change: number of thread posts = posts + 1, since currently, the forum doesn't count the first post as a post
-    // in threads, add quote button/link on all posts
     //with reply threads, fix it not jumping so the id is at the top of the page, there's a small gap
     //just removing the &page= part from the url always gives teh last page, so remove unnecessary code
     
     //production window
-    if (url.indexOf('production.asp') != -1)
+    if (url.indexOf('production.asp') !== -1)
     {
         $('#main').css('max-width', '900px').css('*width', '900px'); //568px //.css('width', '900px')
         $('table').html($('table').html().replace(/<!--/g, '').replace(/-->/g, '').replace(/\?city=/g, '?cityID=').replace(/<font class="minus">Nothing<\/font>/g, '').replace(/\s*&\s*[0-9]+ wall/g, '')); //.replace(/ & /g, '').replace(/<\/a>\s*([0-9]+) wall\s*/g, '</a> & $1 wall').replace(/wall/g, 'walls').replace(/1 walls/g, '1 wall');
@@ -829,10 +860,10 @@ $(document).ready(function ()
         window.parent.$('#id_ifrslot0').css('width', '604px').css('max-width', '604px').css('*width', '604px');
     }
     
-    if (url.indexOf('train.asp') != -1)
+    if (url.indexOf('train.asp') !== -1)
     {
         text_info = $('#infotext');
-        var human = (text_info.text().indexOf('Catapults') != -1);
+        var human = (text_info.text().indexOf('Catapults') !== -1);
         var top_train_button;
         var top_mob_button;
         var top_train_table;
@@ -856,7 +887,7 @@ $(document).ready(function ()
             $('form').prev().remove(); //removes <br>
             //top_train_table.after('<br>');
             
-            if ($('.button.big.city:eq(0)').text().indexOf('Mobilize') == -1)
+            if ($('.button.big.city:eq(0)').text().indexOf('Mobilize') === -1)
             {
                 mobilize = true;
                 $('.button.big.city:eq(0)').attr('title', 'When mobilized, troops in training will be trained double as fast, but at a total loss of about 4% of them.\nMobilization training times are shown in red below, and normal training time in gray.');
@@ -889,7 +920,7 @@ $(document).ready(function ()
         text_info = text_info.clone();
         text_info.find('ul').remove();
         text_info = text_info.html().replace(/[^0-9 ]+/g, '').replace(/[ ]+/g, ' ').trim().split(' ');
-        if (text_info.length != 6)
+        if (text_info.length !== 6)
         {
             alert('train window number mismatch, data array length (is not 10): ' + (text_info.length).toString() + ' array: ' + text_info.join(', '));
         }
@@ -979,7 +1010,7 @@ $(document).ready(function ()
         $('#infotext').html(numberWithCommas($('#infotext').html()));
     }
     
-    if (url.indexOf('kingdom.asp?list=otherkingdoms') != -1)
+    if (url.indexOf('kingdom.asp?list=otherkingdoms') !== -1)
     {
        
         $('#main > h1').css('text-align', 'center').text('Kingdom power list');
@@ -1012,7 +1043,7 @@ $(document).ready(function ()
         */
         
     }
-    else if (url.indexOf('kingdom.asp') != -1)
+    else if (url.indexOf('kingdom.asp') !== -1)
     {
         //moves kd banner under the kd forum button
         var kd_banner = $('center:eq(0)');
@@ -1034,7 +1065,7 @@ $(document).ready(function ()
     }
     
 
-    if (url.indexOf('build.asp') != -1)
+    if (url.indexOf('build.asp') !== -1)
     {
         $('a.button:eq(0)').text($('a.button:eq(0)').text().replace(' the gates', ''));
         var pop_percent = parseInt($('#b1 table tr:eq(5) td:eq(1)').text());
@@ -1103,15 +1134,11 @@ $(document).ready(function ()
         text_info = text_info.clone();
         text_info.find('ul').remove();
         text_info = text_info.html().replace(/[^0-9 ]+/g, '').replace(/[ ]+/g, ' ').trim().split(' ');
-        if (text_info.length == 9) //build info with all peasants employed
+        if (text_info.length === 9) //build info with all peasants employed
         {
             text_info.splice(1, 0, '0');
         }
-        else if (text_info.length == 10) //build info with some peasants unemployed
-        {
-            
-        }
-        else
+        else if (text_info.length !== 10) //build info with some peasants unemployed, otherwise error
         {
             alert('build window number mismatch, data array length (is not 10): ' + (text_info.length).toString() + ' array: ' + text_info.join(', '));
         }
@@ -1124,11 +1151,13 @@ $(document).ready(function ()
         
         var slaves_used = 0;
         var slaves_building = 0;
+        var slave_table_present = false;
         if ($('table').size() > 14) //if you don't have global slaves, this table is not there, so add a check for that table; if there's slaves asigned to the city, it will be there though
         {
             slaves_used = parseInt($('table:eq(1) tr:eq(1)').text().replace(/[^0-9]+/g, ''));
             slaves_building = parseInt($('table:eq(1) tr:eq(2)').text().replace(/[^0-9]+/g, ''));
-        }
+            slave_table_present = true;
+          }
         
         //var c_slave_build_time = Math.ceil(c_build_time/2);
 
@@ -1157,7 +1186,6 @@ $(document).ready(function ()
      
         
         var job_buildings_missing = Math.ceil(c_peasants_unemployed/5);
-
         var max_buildings_capacity = total_buildings + c_build_space_left;
         
         //slaves for productivity handling, default value for transfer slaves
@@ -1182,28 +1210,11 @@ $(document).ready(function ()
                 slaves_add_remove = slaves_missing;
         }   
         
-        if (slaves_used !== 0 || (slaves_missing !== 0 && g_slaves !== 0))
+        if (slave_table_present)
         {
             $('button.slaves:eq(0)').attr('onclick', 'addSlaves("' + slaves_add_remove.toString() + '", "' + cityID.toString() + '", "' + cityName.toString() + '")');
             $('table:eq(1) tr:eq(1) td:eq(1)').html(numberWithCommas($('table:eq(1) tr:eq(1) td:eq(1)').html().trim()) + ' <span style="font-weight:bold;">/</span> <span title="The amount of slaves needed for 100% production." class="underdotted">' + numberWithCommas(slaves_used + slaves_add_remove));
         }
-        
-        
-        /*
-        var pop_percent_peasants = Math.floor(c_peasants*100/(b1*25));
-        var pop_missing_peasants = b1*25 - c_peasants;
-        var pop_percent_total = parseInt($('#b1 tr:eq(5) td:eq(1)').replace(/[^0-9]+/g, ''));
-        var pop_percent_army = 100 - pop_percent_total - pop_percent_peasants;
-        $('table:eq(0) tr:eq(0) th:eq(2)').after('<th>Pop.</th>');
-        if (pop_percent_total != pop_percent_peasants)
-        {
-            $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big"><span title="Percent of houses filled by peasants.">' + pop_percent_peasants.toString() + '%</span><br><span title="Percent of houses filled by army.">' + pop_percent_army.toString() + '</span></td>');
-        }
-        else
-        {
-            $('table:eq(0) tr:eq(1) td:eq(2)').after('<td class="big" title="Percent of houses filled by peasants.">' + pop_percent_peasants.toString() + '%</td>');
-        }
-        */
         
         
         //productivity%
@@ -1246,12 +1257,12 @@ $(document).ready(function ()
         var build_max_button;
         var build_id;
         var building_gold_total = -1;
-        var building_wood_total = -1;
-        var building_stone_total = -1;
+        //var building_wood_total = -1;
+        //var building_stone_total = -1;
         var bbrr;
         var build_cost_gold_span;
-        var build_cost_wood_span;
-        var build_cost_stone_span;
+        //var build_cost_wood_span;
+        //var build_cost_stone_span;
         var top_build_table;
         var top_build_button;
         var top_build_row;
@@ -1259,11 +1270,8 @@ $(document).ready(function ()
         
         for (i = 1; i < 11; i++)
         {
-            //c_build_time;
-            //c_build_space_left, c_num_buildable, c_num_buildable_walls, max_buildings_capacity
-            //c_build_cost_gold, c_build_cost_tree, c_build_cost_stone, c_build_cost_stone_wall
             build_input = $('form table:eq(' + (i - 1).toString() + ') input');
-            if (i != 10)
+            if (i !== 10)
             {
                 buildable_b = c_num_buildable;
                 build_id = 'b_' + i.toString();
@@ -1346,28 +1354,6 @@ this.value = " + buildable_b.toString() + "; \
         //$('#infotext').wrap('<span style="pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; -o-user-select: none; user-select: none;"></span>');
         $('#infotext').html(numberWithCommas($('#infotext').html()));
         //$('#infotext').after('dfgdf<span class="nonselectable"> sdfsf 1253434 sdf23423432gd</span>dfgdg');
-        
-        
-        //formula for max buildings buildable ==> (c_num_buildable+total_buildings_in_construction)/total_buildings ~= 2.04
-     
-        
-
-        /*if (c_build_space_left > c_num_buildable)
-        {
-            if (((c_num_buildable+1)*c_build_cost_gold < g_gold) && ((c_num_buildable+1)*c_build_cost_tree < g_tree) && ((c_num_buildable+1)*c_build_cost_stone < g_stone))
-            {
-                //alert('Got enough resources to build all.\nBuildable: ' + c_num_buildable.toString() + ', Total Buildings: ' + total_buildings.toString() + ', Total Capacity: ' + max_buildings_capacity.toString() + '\n' + (Math.round(parseFloat(100*(c_num_buildable+total_buildings_in_construction)/total_buildings) * 100) / 100).toString() + '% buildable/buildings.\n  ' + (Math.round(parseFloat(100*c_num_buildable/max_buildings_capacity) * 100) / 100).toString() + '% buildable/max_capacity.');
-            }
-            else
-            {
-                //alert('Not enough resources to build all.\nBuildable: ' + c_num_buildable.toString() + ', Total Buildings: ' + total_buildings.toString() + ', Total Capacity: ' + max_buildings_capacity.toString() + '\n' + (Math.round(parseFloat(100*(c_num_buildable+total_buildings_in_construction)/total_buildings) * 100) / 100).toString() + '% buildable/buildings.\n' + (Math.round(parseFloat(100*c_num_buildable/max_buildings_capacity) * 100) / 100).toString() + '% buildable/max_capacity.');
-            }
-        }
-        else
-        {
-            //alert('Can build all.\nBuildable: ' + c_num_buildable.toString() + ', Total Buildings: ' + total_buildings.toString() + ', Total Capacity: ' + max_buildings_capacity.toString() + '\n' + (Math.round(parseFloat(100*(c_num_buildable+total_buildings_in_construction)/total_buildings) * 100) / 100).toString() + '% buildable/buildings.\n' + (Math.round(parseFloat(100*c_num_buildable/max_buildings_capacity) * 100) / 100).toString() + '% buildable/max_capacity.');
-        }*/
-        
 
     }
         

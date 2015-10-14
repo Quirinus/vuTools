@@ -1,4 +1,8 @@
-
+- map: https://static.visual-utopia.com/terrain8.js could be used to check for city sizes before planting them, but I won't do that it since it's a premium feature.
+- forum: replies might be broken when the number indicates a post not on the last page.
+- forum: in threads, add quote button/link on self posts?
+- allow sorting towns in dropdown lists and production. (has to use memory storage)
+- add an "always use max slaves to build" option. (has to use memory storage)
 - change VU Tools.user.js --> vuTools.user.js, and in the script meta as well, and in the update link
 - building: 1/6 and 5/6 split button
 - building/training: when you click on max, clear all the rest
@@ -8,7 +12,6 @@
 - building: turn slave table into a form. slave number into an input. another input for adding/removing slaves (submits both main and this input), and for entering the amount of slaves to release (produce a prompt before releasing, saying the possible outcome). ?
 - training: maybe add total number of troops close to total gold for all tiers, or total op/dp/mu done and in training
 - training: maybe add option to split units between one and mus: "Split remaining population between training unit tx and MU." (only available when you can train all peasants)
-- forum: hitting quote moves you to reply textarea
 - map: make army names partially transparent? (they're over the arrows)
 - map: mark your army if it's prepping. make all prepping borders be 1px instead of 2, but still red.
 - map, private version: https://addons.mozilla.org/en-us/firefox/addon/check4change/ for monitoring armies and stuff that can change, and bind it to a sound alarm
@@ -16,7 +19,6 @@
 - army: add input military sci level. then calculate the army mop/mdp. if military sci not entered, show raw numbers.
 - map: army: make the army size indicators link to the army as well. like the XXXX
 - add a refresh page (whole page, not just a frame) button just right to the clock. http://stackoverflow.com/questions/5404839/how-can-i-refresh-a-page-with-jquery
-- forum: if you paste a table, it adds breadcrumbs after the first row (or before the last, dunno), as well as normally at the end of all posts.
 - link all of the frames variables, etc. (probably would require working in the main, and accesing the frames by something like frame[i].prop...)
 - recolor minimap accoring to relations. add armies. will have to wait until all frames are linked. ^^^^
 - when creating an army/city, add a note that 1 and 2 letter words are removed, and any extra space is turned to one space, and the result is trimmed on both sides
@@ -78,6 +80,38 @@
 -  training: add unit abilites descriptions; ranged troops can defend vs catapults; last tier unit specialty; gaia; nazguls; mages;
 -  training: add base training times for comparison (with no milisci, arms or mobilization; don't forget to count in base orc bonus):
 
+DONE:
+- SEEMS NOT! forum rul replies: check if reply_number is mod50, so indicates the last page, or can be on previous pages as well; since &replies= doesn't redirect to other pages, I guess it's so
+- forum: hitting quote moves you to reply textarea
+- training: maybe: change train time shown when mobilization is on - make it (red mobilize time/(normal color nonmobilze time)
+- turn on land size, productivity, employement, morale and maybe defense in production
+- in production window, separate total tax and total gold from mines, then show them combined under it
+- split tax and mine gold income
+- add: navigation to the top and breadcrumbs to the bottom in the subforums
+- forum: if you paste a table, it adds breadcrumbs after the first row (or before the last, dunno), as well as normally at the end of all posts.
+
+
+      //formula for max buildings buildable ==> (c_num_buildable+total_buildings_in_construction)/total_buildings ~= 2.04
+     
+        
+
+        /*if (c_build_space_left > c_num_buildable)
+        {
+            if (((c_num_buildable+1)*c_build_cost_gold < g_gold) && ((c_num_buildable+1)*c_build_cost_tree < g_tree) && ((c_num_buildable+1)*c_build_cost_stone < g_stone))
+            {
+                //alert('Got enough resources to build all.\nBuildable: ' + c_num_buildable.toString() + ', Total Buildings: ' + total_buildings.toString() + ', Total Capacity: ' + max_buildings_capacity.toString() + '\n' + (Math.round(parseFloat(100*(c_num_buildable+total_buildings_in_construction)/total_buildings) * 100) / 100).toString() + '% buildable/buildings.\n  ' + (Math.round(parseFloat(100*c_num_buildable/max_buildings_capacity) * 100) / 100).toString() + '% buildable/max_capacity.');
+            }
+            else
+            {
+                //alert('Not enough resources to build all.\nBuildable: ' + c_num_buildable.toString() + ', Total Buildings: ' + total_buildings.toString() + ', Total Capacity: ' + max_buildings_capacity.toString() + '\n' + (Math.round(parseFloat(100*(c_num_buildable+total_buildings_in_construction)/total_buildings) * 100) / 100).toString() + '% buildable/buildings.\n' + (Math.round(parseFloat(100*c_num_buildable/max_buildings_capacity) * 100) / 100).toString() + '% buildable/max_capacity.');
+            }
+        }
+        else
+        {
+            //alert('Can build all.\nBuildable: ' + c_num_buildable.toString() + ', Total Buildings: ' + total_buildings.toString() + ', Total Capacity: ' + max_buildings_capacity.toString() + '\n' + (Math.round(parseFloat(100*(c_num_buildable+total_buildings_in_construction)/total_buildings) * 100) / 100).toString() + '% buildable/buildings.\n' + (Math.round(parseFloat(100*c_num_buildable/max_buildings_capacity) * 100) / 100).toString() + '% buildable/max_capacity.');
+        }*/
+        
+
      building tree/stone cost = gold cost/4 = wall stone cost/8
         1 slave works as 1 peasant, but doesn't pay taxes and doesn't spend food
         1 peasant pays 1 gold in taxes, it increases in bigger cities, he also eats 0.25 food
@@ -116,19 +150,20 @@ mobilize = 1/2 (optional for humans, for randomly about 4% training losses)
 
 
 
-- SEEMS NOT! //SOLVED: forum rul replies: check if reply_number is mod50, so indicates the last page, or can be on previous pages as well; since &replies= doesn't redirect to other pages, I guess it's so
-- DONE: training: maybe: change train time shown when mobilization is on - make it (red mobilize time/(normal color nonmobilze time)
-- DONE: turn on land size, productivity, employement, morale and maybe defense in production
-- DONE: in production window, separate total tax and total gold from mines, then show them combined under it
-- DONE: split tax and mine gold income
+
 
 http://static.visual-utopia.com/
 http://static.visual-utopia.com/images/
 http://static.visual-utopia.com/images/dragon.gif
+https://static.visual-utopia.com/main.js
 https://static.visual-utopia.com/menu.js
 https://static.visual-utopia.com/pop.js
 https://static.visual-utopia.com/pngfix.js
 https://static.visual-utopia.com/build.js
+https://static.visual-utopia.com/zoom.js
+https://static.visual-utopia.com/terrain8.js -- contains terrain boundaries. can be used to check for army movement or city placement.
+https://static.visual-utopia.com/fow.js
+https://static.visual-utopia.com/minimap.js
 https://static.visual-utopia.com/style.css?v=3
 http://static.visual-utopia.com/
 http://static.visual-utopia.com/images/
@@ -318,87 +353,60 @@ http://static.visual-utopia.com/images/dragon.gif
         
         gives info only about users that have visible armies
         also, broken, need to fix unique function to give keys
-        /*
-        var armies_info = strArmies.split('&');
-        armies_info.pop();
-        var armies_info_len = armies_info.length;
-        var army_info = '';
-        var ai_users = [];
-        var ai_userIDs = [];
-        var ai_user_kds = [];
-        var ai_user_kdIDs = [];
-        var ai_unique_user_index = [];
-        var ai_unique_kd_index = [];
+	
+I found out something interesting while examining some VU code to help with my userscript. There's a lot of info stored in the source code, info on you in general, and on all the visible cities and armies.
+
+You can check *exactly* how many units an army has or GTs a city has without an EITS , and you can tell if it's filled with only tier 3 units or not (and has the movement bonus), just by looking at the source code of the map frame.
+
+______________________________________
+
+Right click the map scrollbar.
+Choose frame source code.
+(or open up view-source:http://visual-utopia.com/main.asp )
+Ctrl+F the army name
+Find the & before it (unless it's the first army in the list, then find '), and the & after it
+Copy everything in between somewhere else so you can examine it
+Examine it for the info you need:
+______________________________________
+
+Pattern:
+Army ID # Army Name # x # y # Ruler name # Race ## KD ID # Direction # Size # of Kingdom Name # User ID # Preping # Total Troops+1 # Tier3 # Frozen &
+   0    #     1     # 2 # 3 #     4      #   5  ##   7   #     8     #   9  #       10        #   11    #    12   #       13       #  14   #   15
+
+Explanation:
+x = x map coordinate: from -2500 to 2500 (4x2500x2500 = world size)
+y = y map coordinate: from -2500 to 2500 (4x2500x2500 = world size)
+Race = number
+Missing column between two ##? aotd? dragon? some status?
+Direction = empy (shows up as ##) means not moving, 3 north-west, 2 north, 1 north-east, 0 east, -1 south-east, -2 south, -3 south-west, -4 or 4 west, 5 not moving
+Size = 1 means o, 2 oo, 3 ooo, 4 I, II, III, 7 X, XX, XXX, 10 XXXX , XXXX, XXXXX, 13 XXXXX
+Tier3 = tier 3 units only in the army, yes/no? moves faster if yes (1)
+Frozen = frozen for that many ticks
+Total Troops+1 = should be obvious, but listed it again because I wanted to stress it
+
+Example, I want to see the army "Prep":
+1537074 #Prep#-1425#1828#Prince Pure The Caring#6##5540#-4#6# of Zeon#90244#0#1954#0#6
+
+It has 1953 troops, and since it doesn't have the movement speed bonus, it contains some troops that aren't tier 3, so it isn't an only tier 3 army.
+______________________________________
+
+It's similar with cities:
+City ID # City Name # Size # cRace # x # y # Ruler Name # Race # Tag # KD ID # Gates # of Kingdom Name # LoS GT # User ID # Buildings
         
-        function unique(list) {
-            var res = [];
-            $.each(list, function(i, e) {
-                if ($.inArray(ele, res) == -1) res.push(e);
-            });
-           return res;
-        }
-        
-        function unique(value, index, self) { 
-            self.indexOf(value) === index;
-        }
-        
-        I want this to return keys, not elements
-        Array.prototype.unique = function(a){
-            return function(){ return this.filter(a) }
-        }(function(a,b,c){ return c.indexOf(a,b+1) < 0 });
-        
-        for (i = 0; i < armies_info_len; i++)
-        {
-            army_info = armies_info[i].split('#');
-            ai_users[i] = army_info[4];
-            ai_userIDs[i] = army_info[11];
-            if (army_info[10] == '')
-            {
-                ai_user_kds[i] = '';
-            }
-            else
-            {
-                ai_user_kds[i] = army_info[10].substr(4);
-            }
-            ai_user_kdIDs[i] = army_info[7];
-        }
-        
- 
-        get unique users and their: username, user id, kd name, kd id; & dictionary userID --> username
-        ai_unique_user_index = ai_userIDs.unique();
-        alert(ai_unique_user_index);
-        var ai_unique_user_index_len = ai_unique_user_index.length;
-        var userID_to_user_dictionary = [];
-        
-        for (i = 0; i < ai_unique_user_index_len; i++)
-        {
-            ai_users[i] = ai_users[ai_unique_user_index[i]];
-            ai_userIDs[i] = ai_userIDs[ai_unique_user_index[i]];
-            ai_user_kds[i] = ai_user_kds[ai_unique_user_index[i]];
-            ai_user_kdIDs[i] = ai_user_kdIDs[ai_unique_user_index[i]];
-            
-            userID_to_user_dictionary[ai_userIDs[i]] = ai_users[i];
-        }
-        ai_users = ai_users.slice(0, ai_unique_user_index_len - 1);
-        ai_userIDs = ai_userIDs.slice(0, ai_unique_user_index_len - 1);
-        ai_user_kds = ai_user_kds.slice(0, ai_unique_user_index_len - 1);
-        ai_user_kdIDs = ai_user_kdIDs.slice(0, ai_unique_user_index_len - 1);
-        
-        get unique kds and kd ids; & dictionary ukdID --> kdname
-        ai_unique_kd_index = unique(ai_user_kdIDs);
-        var ai_unique_kd_index_len = ai_unique_kd_index.length;
-        var ai_kds = [];
-        var ai_kdIDs = [];
-        var kdID_to_kd_dictionary = [];
-        
-        for (i = 0; i < ai_unique_kd_index_len; i++)
-        {
-            ai_kds[i] = ai_user_kds[ai_unique_user_index[i]];
-            ai_kdIDs[i] = ai_user_kdIDs[ai_unique_user_index[i]];
-             
-            kdID_to_kd_dictionary[ai_kdIDs[i]] = ai_kds[i];
-        }
-        
-        alert(kdID_to_kd_dictionary[5768]);
-        */
+Size = city pic size number
+cRace = city pic "race": hum/orc
+Tag = usually missing, so it shows up as empty ##
+Gates = gates none (empty, shows up as ##), open 0, closed 1
+LoS GT = extra line of sight from GuardTowers (max 1000). GuardTowers = LoSGT*2 (can be off by 1 due to rounding). Since LoS is limited to 1000, you can't know exactly how many more GTs there are after 2000.
+
+		case '1': return 'Human';
+		case '1': return 'Human';
+		case '2': return 'Elf';
+		case '3': return 'Orc';
+		case '4': return 'Dwarf';
+		case '5': return 'Troll';
+		case '6': return 'Halfling';
 		
+From what I can see in the code, arma makes all army sizes move equally (scout speed = horde speed).
+
+Armies of pure tier3 troops still have a slight bonus over others though, but not as much as before.
