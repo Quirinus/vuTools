@@ -4,7 +4,10 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 ![Shows different relation colors, army/city race & owner, additional army tooltip info](https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools_screenshot.png "Relation colors, army/city race & owner, additional army tooltip info")
 
 ### Features
+######General:
 - automatically checks for updates
+- train/build/new army/defense/gates: navigation menu to each other
+- new army/city warns that all 1 & 2 letter words will be removed, as well as extra spaces and non-alphabetical characters
 
 ######Map:
 - all armies and cities have **[race]short_player_name** under them (the ones on armies are clickable)
@@ -15,6 +18,7 @@ A userscript to improve various user interface bits of the Visual Utopia browser
  - self, own kd, friendly kd, neutral no kd, neutral kd, enemy kd
 - army size indicators, movement direction arrow and army path are white
 - all names (except waypoints) have an an outline around them for easier spotting
+- clicking on the army size indicators or army ruler name opens up the army window
 
 ######Build window:
 - added Tax% to the top; mouseover to see numbers
@@ -22,6 +26,7 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - Prod% expanded with: real total prod., peasant and slave productivity; mouseover to see numbers
 - shows optimal slaves number suggestion
 - the optimal amount of slaves to add/remove is automatically entered in the prompt
+- shows all buildings when they are > 0, except Guardtowers, which need > 1
 - added total building costs, for each building, under it
 - added total gold costs to building all different buildings to top and bottom
 - added Max buttons next to each building type (turns to Clear when max buildable number is in the input box)
@@ -62,3 +67,7 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - for Human players; Mobilization:
  - added training times and warnings
  - changed button title to be more clear
+ 
+######Army window:
+- if army is stationed in city, city name links to city training window
+- shows raw op/dp/mu (doesn't count archmages, peasants give 0.05 dp)

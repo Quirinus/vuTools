@@ -1,15 +1,13 @@
-- build: building numbers --> thousands separators
-- map: link arrows to armies, and size signs also
+- add resource icons next to costs. build: all 3, train gold, etc.
+- forum: after writing a post, make it scroll down to it (bottom). can probably be done by manipulating the submit button?
+- build: use slaves #maxuseslaves, thousand separator
 - map: https://static.visual-utopia.com/terrain8.js could be used to check for city sizes before planting them, but I won't do that it since it's a premium feature.
 - forum: replies might be broken when the number indicates a post not on the last page.
 - forum: in threads, add quote button/link on self posts?
 - allow sorting towns in dropdown lists and production. (has to use memory storage)
 - add an "always use max slaves to build" option. (has to use memory storage)
-- change VU Tools.user.js --> vuTools.user.js, and in the script meta as well, and in the update link
 - building: 1/6 and 5/6 split button
 - building/training: when you click on max, clear all the rest
-- building: #maxuseslaves commas
-- building: hide only 0 buildings, except 0 & 1 GT. show the rest.
 - building/training: add "Total troops/buildings:" to the left of "Total training/building (gold) cost:"
 - building: turn slave table into a form. slave number into an input. another input for adding/removing slaves (submits both main and this input), and for entering the amount of slaves to release (produce a prompt before releasing, saying the possible outcome). ?
 - training: maybe add total number of troops close to total gold for all tiers, or total op/dp/mu done and in training
@@ -19,11 +17,9 @@
 - map, private version: https://addons.mozilla.org/en-us/firefox/addon/check4change/ for monitoring armies and stuff that can change, and bind it to a sound alarm
 - map: give alert or info about big (moving or not) armies
 - army: add input military sci level. then calculate the army mop/mdp. if military sci not entered, show raw numbers.
-- map: army: make the army size indicators link to the army as well. like the XXXX
 - add a refresh page (whole page, not just a frame) button just right to the clock. http://stackoverflow.com/questions/5404839/how-can-i-refresh-a-page-with-jquery
 - link all of the frames variables, etc. (probably would require working in the main, and accesing the frames by something like frame[i].prop...)
 - recolor minimap accoring to relations. add armies. will have to wait until all frames are linked. ^^^^
-- when creating an army/city, add a note that 1 and 2 letter words are removed, and any extra space is turned to one space, and the result is trimmed on both sides
 - build page: add number of resource jobs in some of the titles, eg. prod% 
 - build page: remove the extensions from towns with no resource_jobs, and fix the title
 - build page: reconstruct productivity, so the current%/total% is all wrapped up in the span, so all is red, and all has the same title. then the titles includes unfilled jobs (+plus up/down/stable) and peasants + slaves working numbers. and add numberWithCommas to numbers.
@@ -55,7 +51,6 @@
 -  market - allow using size suffixes: 10M or 10m = 1000000, 100k
 -  market - add automatic , adding on numbers
 -  market - allow inserting , and . as thousands separators
--  in training window, add max button, and costs next to input boxes
 -  in kingdom window, maybe make the forum link open the forum inside the window, not in a new tab; same when the kd button is flashing in the menu
 -  kd list window: hide kds that have 0%. some code is already included and commented out in this script
 -  kd: add link to your kd, take it from kd list window. you can compare stuff to other kds there.
@@ -65,24 +60,30 @@
 -  science window: add estimated cost of all sciences, when you hover over one, if you would upgrade it.
 -  build window: add 1:5 button next to the 3 production buildings, and a max button next to all
 -  add option to always auto-use slaves to build if available, store as variable (if option turned on, and no or not enough  slaves globally and/or locally, add a confirmation/info window where you can cancel the build)
--  build window: always show: homes, 3 productions, walls and any other building that passes 10%
--  build window: add train shortcut
--  train window: add build shortcut
 -  prompts on various things: http://visual-utopia.com/forum.asp?f=Suggestions+and+Improvements&t=YESNO%20prompt%20on%20mobile&page=1
 -  on kd page kd list: hide 0% kds. hide worlds other than your own. add checkboxes to show/hide both. world could be detectable from the function scrollToFlag(world, x, y):
 -       frame = window.opener.parent.map
 -       else frame = parent.parent.map
 -  when changing the city/army from a dropdown box in a window, change it in the global menu, and vice-versa
--  add build, train and defense buttons on the build/train/defense windows of city pages
--  similar links as ^above for armies
--  army window: lots of useful info in the script at the bottom
--  production window: add check for red productivity % text
+-  build: add check for red productivity % text
 -  training window: in the training timeline table, hide 0s, center numbers and time headers, right align unit names, fix light/dark rows/columns with overlapping opacities?
 -  training: title explaining mobilization and mouse pointer when you hover over (xx mobilized) and (xx/yy days)
 -  training: add unit abilites descriptions; ranged troops can defend vs catapults; last tier unit specialty; gaia; nazguls; mages;
 -  training: add base training times for comparison (with no milisci, arms or mobilization; don't forget to count in base orc bonus):
 
 DONE:
+-  in training window, add max button, and costs next to input boxes
+- when creating an army/city, add a note that 1 and 2 letter words are removed, and any extra space is turned to one space, and the result is trimmed on both sides
+- map: army: make the army size indicators link to the army as well. like the XXXX
+- change VU Tools.user.js --> vuTools.user.js, and in the script meta as well, and in the update link
+- map: link arrows to armies, and size signs also (added size, but not arrow, arrows wouldn't be good)
+-  army window: lots of useful info in the script at the bottom
+-  build window: add train shortcut
+-  train window: add build shortcut
+-  add build, train and defense buttons on the build/train/defense windows of city pages
+-  similar links as ^above for armies
+- building: hide only 0 buildings, except 0 & 1 GT. show the rest.
+- build: building numbers --> thousands separators
 - SEEMS NOT! forum rul replies: check if reply_number is mod50, so indicates the last page, or can be on previous pages as well; since &replies= doesn't redirect to other pages, I guess it's so
 - forum: hitting quote moves you to reply textarea
 - training: maybe: change train time shown when mobilization is on - make it (red mobilize time/(normal color nonmobilze time)

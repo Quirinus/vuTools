@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         vuTools
-// @version      0.22
+// @version      0.23
 // @author       Ivan Jelenić (Quirinus)
 // @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
 // @homepage     https://github.com/Quirinus/
@@ -120,9 +120,8 @@ $(document).ready(function ()
     /*function numberWithCommas_unselectable(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "<span class='nonselectable'>,</span>");
     }*/
-    
-    var text_info = '';
-    
+
+    var text_info = '';                              
     if (url.indexOf('main.asp') != -1)
     {
         var citynames = $.makeArray($('.citynames'));
@@ -132,7 +131,7 @@ $(document).ready(function ()
         var city_name_span = '';
         var city_ID = -1;
         var city_gts = -1;
-        var race = '';
+        var city_race = '';
         var ruler_name = '';
         var ruler_name_space_pos = -1;
         var ruler_name_style = '';
@@ -169,6 +168,7 @@ $(document).ready(function ()
         var army_ruler_name = '';
         var army_ruler_name_short = '';
         var army_size = '';
+        var army_size_img;
         var army_race = '';
         var army_race_short = '';
         var army_kd = '';
@@ -181,6 +181,7 @@ $(document).ready(function ()
         var army_name_width = '';
         var army_color = '';
         var army_size_index = -1;
+        var army_race_numbers = ['Human', 'Elf', 'Orc', 'Dwarf', 'Troll', 'Halfling'];
         var army_size_signs = ['o', 'oo', 'ooo', 'I', 'I I', 'I I I', 'x',  'xx', 'xxx', 'xxxx', 'xxxxx', 'xxxxx+']; //▮
         var army_size_names = ['scout', 'section', 'platoon', 'company', 'battalion', 'regiment', 'brigade',  'division', 'corps', 'army', 'army group', 'horde'];
         var army_size_numbers = ['(1-5)', '(8-12)', '(20-50)', '(100-300)', '(500-1500)', '(2000-4000)', '(around 5000)',  '(10,000-20,000)', '(around 50,000)', '(100,000-200,000)', '(around 500,000)', 'of more then one million soldiers']; //around 500,000 --> (200,000-1,000,000)
@@ -215,13 +216,25 @@ $(document).ready(function ()
         var ai_armyIDs = [];
         var ai_troops = [];
         var ai_t3 = [];
+        var ai_name = [];
+        var ai_race = [];
+        var ai_size = [];
+        var ai_size_signs = [];
+        var ai_x = [];
+        var ai_y = [];
         
         for (i = 0; i < armies_info_len; i++)
         {
             army_info = armies_info[i].split('#');
+            ai_name[i] = army_info[1];
+            ai_x[i] = (parseInt(army_info[2]) + 2500).toString(); // since x range from the game is -2500 to 2500, and the click detection is 0 to 5000, I add 2500 to this
+            ai_y[i] = (parseInt(army_info[3]) + 2500).toString(); // since y range from the game is -2500 to 2500, and the click detection is 0 to 5000, I add 2500 to this
             ai_armyIDs[i] = army_info[0];
+            ai_race[i] = army_race_numbers[parseInt(army_info[5]) - 1]; //from https://static.visual-utopia.com/main.js
             ai_users[i] = army_info[4];
             //ai_userIDs[i] = army_info[11];
+            ai_size[i] = army_size_names[parseInt(army_info[9]) - 1];
+            ai_size_signs[i] = army_size_signs[parseInt(army_info[9]) - 1];
             ai_troops[i] = numberWithCommas(parseInt(army_info[13])-1) + ' troops';
             if (ai_troops[i] == '1 troops')
                 ai_troops[i] = '1 soldier';
@@ -237,7 +250,91 @@ $(document).ready(function ()
             //ai_user_kdIDs[i] = army_info[7];
         }
         var armyID_check_index = -1;
+
+        /*var _oldpop = pop;
+        function pop() {
+            _oldpop();//if you need previous function
+            //extend code here;
+            alert('gg');
+        }*/
+        //alert(pop('armyInfoE.asp?armyID=1537470'));
         
+        
+        
+        //hide armies - unfininshed
+        /*var shift_click_distance = -1;
+        var shift_click_army_id = -1;
+        var shift_click_x = -1;
+        var shift_click_y = -1;
+        function get_armies_in_distance()
+        {
+            //alert($(armies[3]).attr('onclick').replace("pop('armyInfoE.asp?armyID=", '').replace("')", '').trim() == 1537446);
+            for (i = 0; i < armies_info_len; i++)
+            {
+                shift_click_distance = Math.sqrt(Math.pow(ai_x[i] - shift_click_x,2) + Math.pow(ai_y[i] - shift_click_y,2));
+                if (shift_click_distance < 150)
+                {
+                    shift_click_army_id = ai_armyIDs[i];
+                    for (j = 0; j < army_len; j++)
+                    {
+                        if ($(armies[j]).attr('onclick').replace("pop('armyInfoE.asp?armyID=", '').replace("')", '').trim() == shift_click_army_id)
+                        {
+                            $(armies[j]).css('z-index', '-50');
+                            $(armies[j]).next().css('z-index', '-50');
+                            $('img[style*="top: ' + (parseInt($(armies[j]).css('top'))-6).toString() + 'px; left: ' + (parseInt($(armies[j]).css('left'))-1).toString() + 'px"]').css('z-index', '-50');
+                            //alert('img[style*="top: ' + (parseInt($(armies[j]).css('top'))-6).toString() + 'px; left: ' + (parseInt($(armies[j]).css('left'))-1).toString() + 'px"]');
+                            //alert(shift_click_distance + ' ' + ai_size_signs[i] + '\n' + ai_name[i] + ': '+ ai_race[i] + ' ' + ai_size[i] + ' (' + ai_troops[i]  + ')\n' + ai_users[i] + ' ' + ai_user_kds[i] + ai_t3[i]);
+                        }
+                    }
+                }
+            }
+        }   
+        $("#hideSpill > img").click(function(e){ //#karta > img, #hideSpill > img, #hideSpill > div, html > body > div > div, .fow
+            if (e.shiftKey)
+            {
+                if ($(this).attr('class') === 'fow')
+                {
+                    alert('fow');
+                    shift_click_x = e.pageX - $(this).parent().offset().left;
+                    shift_click_y = e.pageY - $(this).parent().offset().top;
+                    get_armies_in_distance();
+                }
+                else if ($(this).prop("tagName") === 'IMG')
+                {
+                    if ($(this).parent().attr('id') === 'karta')
+                    {
+                        alert('#karta > img');
+                        shift_click_x = e.pageX - $(this).parent().offset().left - 2500;
+                        shift_click_y = e.pageY - $(this).parent().offset().top - 2500;
+                        get_armies_in_distance();
+                    }
+                    else if ($(this).parent().attr('id') === 'hideSpill')
+                    {
+                        alert('#hideSpill > img');
+                        shift_click_x = parseInt($(this).css('left')) + e.pageX - $(this).offset().left;
+                        shift_click_y = parseInt($(this).css('top')) + e.pageY - $(this).offset().top;
+                        get_armies_in_distance();
+                    }
+                }
+                else if ($(this).prop("tagName") === 'DIV')
+                {
+                    if ($(this).parent().attr('id') === 'hideSpill')
+                    {
+                        alert('#hideSpill > div');
+                        shift_click_x = parseInt($(this).css('left')) + e.pageX - $(this).offset().left;
+                        shift_click_y = parseInt($(this).css('top')) + e.pageY - $(this).offset().top;
+                        get_armies_in_distance();
+                    }
+                    else if (($(this).parent().prop("tagName") === 'DIV') && ($(this).parent().parent().prop("tagName") === 'BODY') && ($(this).parent().parent().parent().prop("tagName") === 'HTML'))
+                    {
+                        alert('html > body > div > div');
+                        shift_click_x = e.pageX - $(this).offset().left;
+                        shift_click_y = e.pageY - $(this).offset().top;
+                        get_armies_in_distance();
+                    }
+                }
+            }
+        });*/
         
         //armies
         $('div[style*="arrow"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)'); //css('z-index', '2'); // and add image map with coordinates from img, rotated for each
@@ -249,6 +346,9 @@ $(document).ready(function ()
             title = $(armies[i]).attr('title');
             army_onclick = $(armies[i]).attr('onclick');
             army_ID = army_onclick.replace("pop('armyInfoE.asp?armyID=", '').replace("')", '');
+            //army_onclick = 'pop2(' + army_ID +');';
+            //army_onclick = 'if (!e.shiftKey) ' + army_onclick;
+            //$(armies[i]).attr('onclick', army_onclick);
             name_separator_pos1 = title.indexOf(': ');
             name_separator_pos2 = title.substring(name_separator_pos1 + ': '.length).indexOf(' ');
             name_separator_pos3 = title.substring(name_separator_pos2  + ' '.length).indexOf(' ');
@@ -361,7 +461,7 @@ $(document).ready(function ()
             
 
 
-           
+           //add army race + ruler name, and make it link to the army
             army_name_span = $('<a></a>')
             .text(army_race_short + army_ruler_name_short)
             .css({
@@ -382,6 +482,12 @@ $(document).ready(function ()
             .attr('title', title)
             .attr('onclick', army_onclick);
 
+            //make army size signs link to the army as well
+            army_size_img = $('img[style*="top: ' + (parseInt($(armies[i]).css('top'))-6).toString() + 'px; left: ' + (parseInt($(armies[i]).css('left'))-1).toString() + 'px"]');
+            army_size_img
+            .css('cursor', 'pointer')
+            .attr('title', title)
+            .attr('onclick', army_onclick);
             
             $(armies[i]).after(army_name_span);
             army_name_width = parseInt(army_name_span.width());
@@ -396,6 +502,7 @@ $(document).ready(function ()
                         + army_ruler_name + ' ' + army_kd + army_t3;// + army_size_signs[army_size_index] + army_size_numbers[army_size_index]
                 $(armies[i]).attr('title', title); //add for own armies
                 army_name_span.attr('title', title); //add for own armies
+                army_size_img.attr('title', title); //add for own armies
             }
             else
             {
@@ -479,8 +586,8 @@ $(document).ready(function ()
             if (title.indexOf('Your city:') === -1)
             {
                 name_separator_pos1 = title.indexOf(' city owned by ');
-                race = title.substring(0, name_separator_pos1);
-                race = '[' + race.substr(0,2) + ']';
+                city_race = title.substring(0, name_separator_pos1);
+                city_race = '[' + city_race.substr(0,2) + ']';
                 name_separator_pos2 = title.indexOf(' of ');
                 name_separator_pos3 = title.indexOf(':');
 
@@ -526,7 +633,7 @@ $(document).ready(function ()
                     ruler_name = ruler_name.substring(0, 9);
             }
             
-            //citynames[i].innerHTML = race + city_name;
+            //citynames[i].innerHTML = city_race + city_name;
             ruler_name_style = $(citynames[i]).attr('style');
             $(citynames[i]).css({
                 'text-shadow' : 'black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px, black 0px 0px 1px',
@@ -554,7 +661,7 @@ $(document).ready(function ()
                     //color_case = color_ownkd;
                     $(citynames[i]).css('color', color_ownkd);
                     city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                    .html(race + ruler_name)
+                    .html(city_race + ruler_name)
                     .css({
                         'width' : '100px',
                         'height' : '20px',
@@ -581,7 +688,7 @@ $(document).ready(function ()
                         //color_case = color_friendly;
                         $(citynames[i]).css('color', color_friendly);
                         city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                        .html(race + ruler_name)
+                        .html(city_race + ruler_name)
                         .css({
                             'width' : '100px',
                             'height' : '20px',
@@ -610,7 +717,7 @@ $(document).ready(function ()
                         //color_case = color_neutral;
                         $(citynames[i]).css('color', color_neutral);
                         city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                        .html(race + ruler_name)
+                        .html(city_race + ruler_name)
                         .css({
                             'width' : '100px',
                             'height' : '20px',
@@ -639,7 +746,7 @@ $(document).ready(function ()
                         //color_case = color_enemy;
                         $(citynames[i]).css('color', color_enemy);
                         city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                        .html(race + ruler_name)
+                        .html(city_race + ruler_name)
                         .css({
                             'width' : '100px',
                             'height' : '20px',
@@ -665,7 +772,7 @@ $(document).ready(function ()
                 //color_case = color_neutral_nokd;
                 $(citynames[i]).css('color', color_neutral_nokd);
                 city_name_span = $('<span style="' + ruler_name_style +'"></span>')
-                .html(race + ruler_name)
+                .html(city_race + ruler_name)
                 .css({
                     'width' : '100px',
                     'height' : '20px',
@@ -684,7 +791,7 @@ $(document).ready(function ()
                 kd_found = true;
             }
         }
-    }
+     }
     
         //menu
         //hidden buttons (display: none);, all with special ids
@@ -1014,6 +1121,7 @@ $(document).ready(function ()
             train_input.after(train_max_button);
         }
         $('#infotext').html(numberWithCommas($('#infotext').html()));
+
     }
     
     if (url.indexOf('kingdom.asp?list=otherkingdoms') !== -1)
@@ -1024,7 +1132,6 @@ $(document).ready(function ()
         //$('#redirlink').show();
         $('#main > table:eq(0)').after('<a href="kingdom.asp" class="button">Return to kingdom page</a><br>');
         $('#main > table:eq(0)').remove();
-        
         
         //make the mouse a pointer when hovering over the whole label
         //http://stackoverflow.com/a/20705524
@@ -1232,7 +1339,7 @@ $(document).ready(function ()
         var productivity_percent_peasants = (resource_jobs === 0) ? 0 : Math.round(c_peasants*100/resource_jobs); //can be over 100%
         var productivity_percent_slaves = (resource_jobs === 0) ? 0 : Math.round(slaves_used*100/resource_jobs);
         productivity_info.children(':eq(0)').attr('title', numberWithCommas(productivity_info.children(':eq(0)').attr('title'))).addClass('underdotted');
-        productivity_info.html(productivity_info.html() + '/<span class="underdotted" title="Productivity due to ' + numberWithCommas(slaves_used + c_peasants) + ' peasants and slaves working in resouce-generating buildings.">' + productivity_percent_real.toString() + '%</span><br><span style="font-size:small;"><span class="underdotted" title="Productivity due to ' + numberWithCommas(c_peasants) + ' peasants working in resouce-generating buildings.">' +
+        productivity_info.html(productivity_info.html() + '/<span class="underdotted" title="Productivity due to ' + numberWithCommas(slaves_used + c_peasants) + ' peasants and slaves working in resouce-generating buildings.\nThere are ' + numberWithCommas(resource_jobs) + ' resource-producing jobs available for them.">' + productivity_percent_real.toString() + '%</span><br><span style="font-size:small;"><span class="underdotted" title="Productivity due to ' + numberWithCommas(c_peasants) + ' peasants working in resouce-generating buildings.">' +
         productivity_percent_peasants.toString() + '%</span> + <span class="underdotted" title="Productivity due to ' + numberWithCommas(slaves_used) + ' slaves working in resouce-generating buildings.">' + productivity_percent_slaves.toString() + '%</span></span>');
         $('table:eq(0) tr:eq(1) td:eq(1) :eq(0)').attr('title', numberWithCommas($('table:eq(0) tr:eq(1) td:eq(1) :eq(0)').attr('title'))).addClass('underdotted');
         
@@ -1361,6 +1468,171 @@ this.value = " + buildable_b.toString() + "; \
         $('#infotext').html(numberWithCommas($('#infotext').html()));
         //$('#infotext').after('dfgdf<span class="nonselectable"> sdfsf 1253434 sdf23423432gd</span>dfgdg');
 
+        //thousand separators for buildings (built and in construction)
+        for (i = 2; i < 12; i++)
+        {
+            $('form table:eq(' + i.toString() + ') tr:eq(3) td:eq(1)').text(numberWithCommas($('form table:eq(' + i.toString() + ') tr:eq(3) td:eq(1)').text()));
+            $('form table:eq(' + i.toString() + ') tr:eq(4) td:eq(1)').text(numberWithCommas($('form table:eq(' + i.toString() + ') tr:eq(4) td:eq(1)').text()));
+        }
+            $('form table:eq(12) tr:eq(3) td:eq(1)').text(numberWithCommas($('form table:eq(12) tr:eq(3) td:eq(1)').text()));
+        
+        //show buildings    //total_buildings
+        if(b0 > 0) document.getElementById('b0').style.display = 'block'; //b0 - Wreckages
+        if(b1 > 0 || b1i > 0) document.getElementById('b1').style.display = 'block'; //b1 - Homes
+        if(b1 > 0 || b1i > 0) document.getElementById('b1').style.display = 'block'; //b2 - Farms
+        if(b2 > 0 || b2i > 0) document.getElementById('b2').style.display = 'block'; //b3 - Mines
+        if(b3 > 0 || b3i > 0) document.getElementById('b3').style.display = 'block'; //b4 - Magic Towers
+        if(b4 > 0 || b4i > 0) document.getElementById('b4').style.display = 'block'; //b5 - Guardtowers
+        if(b5 > 1 || b5i > 0) document.getElementById('b5').style.display = 'block';                 //b6 - Guardtowers, don't show GT if it has 0 or 1 GT
+        if(b6 > 0 || b6i > 0) document.getElementById('b6').style.display = 'block'; //b6 - Taverns
+        if(b7 > 0 || b7i > 0) document.getElementById('b7').style.display = 'block'; //b7 - Lumbermills
+        if(b8 > 0 || b8i > 0) document.getElementById('b8').style.display = 'block'; //b8 - Armories
+        if(b9 > 0 || b9i > 0) document.getElementById('b9').style.display = 'block'; //b9 - Warehouses
+
+        if(wall>0) document.getElementById('wall').style.display = 'block'; // && wall<maxWall
+    }
+    
+    if ((url.indexOf('train.asp') !== -1) || (url.indexOf('build.asp') !== -1))
+    {
+        //buttons/links to other windows
+        var city_name_h1 = $('#main h1');
+        var city_id_s = $('#cityid').val().toString();
+        var city_nav_table = $('<table style="background: black; float: left;"></table>');
+        var city_nav_tr = $('<tr></tr>');
+        city_name_h1.after(city_nav_table);
+        city_nav_table.append(city_nav_tr);
+        city_name_h1.css('float', 'left');
+        city_name_h1.css('margin-right', '1em');
+        city_nav_tr.append('<td><a href="build.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/but_build.gif"></a></td>');
+        city_nav_tr.append('<td><a href="train.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/but_train.gif"></a></td>');
+        city_nav_tr.append('<td><a href="NewArmy.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/newarmy.gif"></a></td>');
+        city_nav_tr.append('<td><a href="defence.asp?cityID=' + city_id_s + '#' + city_id_s + '"><img src="https://static.visual-utopia.com/images/defence.gif"></a></td>');
+        city_nav_tr.append('<td><a href="gates.asp?cityID=' + city_id_s + '#' + city_id_s + '"><img src="https://static.visual-utopia.com/images/closegate.gif"></a></td>');
+        
+        //city_nav_tr.append('<td><a class="button big" style="background-image: url(\'images/but_army.gif\'); width: 170px; padding-left: 38px;" href="armyInfo.asp">Army</a></td>');
     }
         
+    if ((url.indexOf('newArmy.asp') !== -1) || (url.indexOf('NewArmy.asp') !== -1))
+    {
+        //buttons/links to other windows
+        var city_name_h1 = $('#main h1');
+        var city_id_s = $('select').val().toString();
+        var city_nav_table = $('<table style="background: black; float: left;"></table>');
+        var city_nav_tr = $('<tr></tr>');
+        city_name_h1.after(city_nav_table);
+        city_nav_table.append(city_nav_tr);
+        city_name_h1.css('float', 'left');
+        city_name_h1.css('margin-right', '1em');
+        city_nav_tr.append('<td><a href="build.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/but_build.gif"></a></td>');
+        city_nav_tr.append('<td><a href="train.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/but_train.gif"></a></td>');
+        city_nav_tr.append('<td><a href="NewArmy.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/newarmy.gif"></a></td>');
+        city_nav_tr.append('<td><a href="defence.asp?cityID=' + city_id_s + '#' + city_id_s + '"><img src="https://static.visual-utopia.com/images/defence.gif"></a></td>');
+        city_nav_tr.append('<td><a href="gates.asp?cityID=' + city_id_s + '#' + city_id_s + '"><img src="https://static.visual-utopia.com/images/closegate.gif"></a></td>');
+        city_nav_table.after('<div style="clear: both;"></div>');
+        
+        $('#infotext').append('<p>All one and two letter words, excessive spaces and non-alphabetical characters will be removed from the name.</p>');
+    }
+    
+    if ((url.indexOf('defence.asp') !== -1) || (url.indexOf('gates.asp') !== -1))
+    {
+        //buttons/links to other windows
+        var city_name_h1 = $('#main h1');
+        city_name_h1.text(city_name_h1.text().replace('defences', ''));
+        var city_id_s = location.hash.substring(1);
+        //if (city_id_s !== '')
+        //{
+        var city_nav_table = $('<table style="background: black; float: left;"></table>');
+        var city_nav_tr = $('<tr></tr>');
+        city_name_h1.after(city_nav_table);
+        city_nav_table.append(city_nav_tr);
+        city_name_h1.css('float', 'left');
+        city_name_h1.css('margin-right', '1em');
+        city_nav_tr.append('<td><a href="build.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/but_build.gif"></a></td>');
+        city_nav_tr.append('<td><a href="train.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/but_train.gif"></a></td>');
+        city_nav_tr.append('<td><a href="NewArmy.asp?cityID=' + city_id_s + '"><img src="https://static.visual-utopia.com/images/newarmy.gif"></a></td>');
+        city_nav_tr.append('<td><a href="defence.asp?cityID=' + city_id_s + '#' + city_id_s + '"><img src="https://static.visual-utopia.com/images/defence.gif"></a></td>');
+        city_nav_tr.append('<td><a href="gates.asp?cityID=' + city_id_s + '#' + city_id_s + '"><img src="https://static.visual-utopia.com/images/closegate.gif"></a></td>');
+        city_nav_table.after('<div style="clear: both;"></div>');
+        //}
+    }
+    
+    if (url.indexOf('armyInfo.asp') !== -1)
+    {
+        //makes the city name clickable
+        var army_array_index = -1;
+        var army_city_id = -1;
+        function make_loc_clickable() {
+            if ($('#located').text() !== 'on mission')
+            {
+                var armys_len = armys.length;
+                for (i = 0; i < armys_len; i++)
+                {
+                    if (armys[i][1] === $('h1').text())
+                    {
+                        army_array_index = i;
+                        break;
+                    }
+                }
+                //armys[army_array_index][13] //city name
+                army_city_id = armys[army_array_index][14];
+                $('#located').html('<a href="train.asp?cityID=' + army_city_id + '">' + $('#located').text() + '</a>');
+            }
+        }
+        make_loc_clickable();
+        $('select').change(function () {
+            make_loc_clickable();
+        });
+        
+        
+        //calculates op and dp
+        var magic_science = 0;
+        var military_science = 0;
+        //var morale = $('#morale');
+        //var exp = $('#experience');
+        var unit_op = [];
+        var unit_dp = [];
+        var raw_op, raw_dp, mod_op, mod_dp;
+        
+        function calc_raw_power()
+        {
+            unit_op[0] = [3, 4, 11, 0, 40]; //Human
+            unit_op[1] = [2, 2, 7, 0, 3*magic_science]; //Elf
+            unit_op[2] = [1, 3, 8, 0, 160]; //Orc
+            unit_op[3] = [2, 5, 10, 0, 6]; //Dwarf
+            unit_op[4] = [2, 5, 10, 1, 35]; //Troll
+            unit_op[5] = [0, 2, 6, 0, 8]; //Halfling
+
+            unit_dp[0] = [2, 5, 11, 0, 20]; //Human
+            unit_dp[1] = [1, 10, 10, 0, 3*magic_science]; //Elf
+            unit_dp[2] = [2, 3, 8, 0, 160]; //Orc
+            unit_dp[3] = [2, 6, 8, 0, 3]; //Dwarf
+            unit_dp[4] = [3, 4, 10, 0, 35]; //Troll
+            unit_dp[5] = [1, 2, 4, 0, 8]; //Halfling
+
+            raw_op = parseInt($('#s1').text())*unit_op[race-1][0] + parseInt($('#s2').text())*unit_op[race-1][1] + parseInt($('#s3').text())*unit_op[race-1][2] +
+                parseInt($('#s4').text())*unit_op[race-1][3] + parseInt($('#s5').text())*unit_op[race-1][4];
+            raw_dp = parseInt($('#s1').text())*unit_dp[race-1][0] + parseInt($('#s2').text())*unit_dp[race-1][1] + parseInt($('#s3').text())*unit_dp[race-1][2] +
+                parseInt($('#s4').text())*unit_dp[race-1][3] + parseInt($('#s5').text())*unit_dp[race-1][4] + parseInt($('#army_peasants').text())*0.05;
+            //var mod_op = raw_op*(1 + military_science*0.1)*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
+            //var mod_dp = raw_dp*(1 + military_science*0.1)*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
+        }
+
+        calc_raw_power();
+        $('#armyinfo table:eq(1)').before('<table><tr><td><span class="underdotted" title="Archmages are counted 0/0. Peasants give 0.05 defense.">Raw power</span>: <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="raw_op">' + numberWithCommas(raw_op) + '</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="raw_dp">' + numberWithCommas(raw_dp) + '</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif"><span id="mus">' + numberWithCommas(parseInt($('#s4').text())) + '</span></td></tr></table>');
+        $('select').change(function () {
+            calc_raw_power();
+            $('#raw_op').text(numberWithCommas(raw_op));
+            $('#raw_dp').text(numberWithCommas(raw_dp));
+            $('#mus').text(numberWithCommas(parseInt($('#s4').text())));
+        });
+      
+    }
+    
+    if (url.indexOf('scoutTerrain.asp') !== -1)
+    {
+        $('#infotext').append('<p>All one and two letter words, excessive spaces and non-alphabetical characters will be removed from the name.</p>');
+    }
+    
+    
+
 });
