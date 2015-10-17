@@ -48,7 +48,7 @@
 -  in market, remember the resource tab open when switching between buy/sell
 -  market - add max buy/sell price when it's empty; also add native prices for each when empty; try to figure out native prices when not empty
 -  market - allow entering an amount and then the multiplier(floored) for easier selling
--  market - allow using size suffixes: 10M or 10m = 1000000, 100k
+-  market - allow using size suffixes: 10M or 10m = 1000000, 100k: http://numeraljs.com/
 -  market - add automatic , adding on numbers
 -  market - allow inserting , and . as thousands separators
 -  in kingdom window, maybe make the forum link open the forum inside the window, not in a new tab; same when the kd button is flashing in the menu

@@ -1,14 +1,9 @@
-# vuTools <sub><sup>(v0.23)</sup></sub>
+# vuTools <sub><sup>(v0.24)</sup></sub>
 A userscript to improve various user interface bits of the Visual Utopia browser game.
 
 ![Shows different relation colors, army/city race & owner, additional army tooltip info](https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools_screenshot.png "Relation colors, army/city race & owner, additional army tooltip info")
 
 ### Features
-######General:
-- automatically checks for updates
-- train/build/new army/defense/gates: navigation menu to each other
-- new army/city warns that all 1 & 2 letter words will be removed, as well as extra spaces and non-alphabetical characters
-
 ######Map:
 - all armies and cities have **[race]short_player_name** under them (the ones on armies are clickable)
 - armies display number of troops when you hover over them
@@ -35,28 +30,6 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - added thousand separator commas almost everywhere
 - everything that is underdotted has mouseover titles that give additional info
 
-######Kingdom window:
-- added list other kds button under players list
-- kd forum button now opens forum in the same window
-- small style/position changes
-
-######Kingdoms power list window:
-- added a return to kd button on the top
-- small style/position changes
-
-######Production window:
-- added columns: morale%, productivity%, employement%, population%, land
-(and total land), defense (troops+clickable # of armies and troops)
-- added total tax income and total (mines) gold income
-
-######Forum:
-- breadcrumbs on the bottom
-- page list on the top
-- last page/post link after thread names
-- bottom button
-- jumps to relevant post when opening via blinking kd button
-- quote function
-
 ######Training window:
 - added total training costs, for each tier of unit, under it
 - added total gold costs to train all tier units to top and bottom
@@ -70,4 +43,44 @@ A userscript to improve various user interface bits of the Visual Utopia browser
  
 ######Army window:
 - if army is stationed in city, city name links to city training window
-- shows raw op/dp/mu (doesn't count archmages, peasants give 0.05 dp)
+- shows army raw op/dp/mu (peasants give 0.05 dp)
+- calculate mod op/dp by choosing military science level (if elf, magic too, for archmages)
+- shows city op/dp/mu if the army is in it
+- added commas to numbers
+
+######Forum:
+- breadcrumbs on the bottom
+- page list on the top
+- last page/post link after thread names
+- bottom button
+- jumps to relevant post when opening via blinking kd button
+- quote function
+
+######Market:
+- buy: cost input
+- buy: max button
+- buy: doesn't allow entering more than max
+- sell: max button
+
+######Production window:
+- added columns: morale%, productivity%, employement%, population%, land
+(and total land), defense (troops+clickable # of armies and troops)
+- added total tax income and total (mines) gold income
+
+######Kingdom window:
+- added list other kds button under players list
+- kd forum button now opens forum in the same window
+- small style/position changes
+
+######Kingdoms power list window:
+- added a return to kd button on the top
+- small style/position changes
+
+######Menu:
+- train/build/new army/defense/gates: navigation menu to each other
+- changed order of Build and Train
+- changed order of Merge and New City
+
+######General:
+- automatically checks for updates
+- new army/city warns that all 1 & 2 letter words will be removed, as well as extra spaces and non-alphabetical characters

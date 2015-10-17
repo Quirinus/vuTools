@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         vuTools
-// @version      0.23
+// @version      0.24
 // @author       Ivan Jelenić (Quirinus)
 // @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
 // @homepage     https://github.com/Quirinus/
@@ -14,7 +14,6 @@
 // @grant        none
 // ==/UserScript==
 
-//update url: https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools.user.js
 
 $(document).ready(function ()
 {
@@ -1558,10 +1557,26 @@ this.value = " + buildable_b.toString() + "; \
     
     if (url.indexOf('armyInfo.asp') !== -1)
     {
+        
         //makes the city name clickable
         var army_array_index = -1;
         var army_city_id = -1;
         function make_loc_clickable() {
+            //adds thousand spearators
+            $('#upkeep').text(numberWithCommas($('#upkeep').text()));
+            $('#army_peasants').text(numberWithCommas($('#army_peasants').text()));
+            $('#s1').text(numberWithCommas($('#s1').text()));
+            $('#s2').text(numberWithCommas($('#s2').text()));
+            $('#s3').text(numberWithCommas($('#s3').text()));
+            $('#s4').text(numberWithCommas($('#s4').text()));
+            $('#s5').text(numberWithCommas($('#s5').text()));
+            $('#s1i').text(numberWithCommas($('#s1i').text()));
+            $('#s2i').text(numberWithCommas($('#s2i').text()));
+            $('#s3i').text(numberWithCommas($('#s3i').text()));
+            $('#s4i').text(numberWithCommas($('#s4i').text()));
+            $('#s5i').text(numberWithCommas($('#s5i').text()));
+            
+            //when in city
             if ($('#located').text() !== 'on mission')
             {
                 var armys_len = armys.length;
@@ -1576,56 +1591,121 @@ this.value = " + buildable_b.toString() + "; \
                 //armys[army_array_index][13] //city name
                 army_city_id = armys[army_array_index][14];
                 $('#located').html('<a href="train.asp?cityID=' + army_city_id + '">' + $('#located').text() + '</a>');
+
+                //adds thousand spearators when in city
+                $('#city_peasants').text(numberWithCommas($('#city_peasants').text()));
+                if ($('#free_beds').text().indexOf('-') !== -1)
+                    $('#free_beds').text('-' + numberWithCommas($('#free_beds').text().replace('-', '')));
+                else
+                    $('#free_beds').text(numberWithCommas($('#free_beds').text()));
+                $('#cityS1').text(numberWithCommas($('#cityS1').text()));
+                $('#cityS2').text(numberWithCommas($('#cityS2').text()));
+                $('#cityS3').text(numberWithCommas($('#cityS3').text()));
+                $('#cityS4').text(numberWithCommas($('#cityS4').text()));
+                $('#cityS5').text(numberWithCommas($('#cityS5').text()));
+
             }
         }
+        
         make_loc_clickable();
         $('select').change(function () {
             make_loc_clickable();
         });
         
-        
-        //calculates op and dp
         var magic_science = 0;
         var military_science = 0;
         //var morale = $('#morale');
         //var exp = $('#experience');
         var unit_op = [];
         var unit_dp = [];
+        unit_op[0] = [3, 4, 11, 0, 40]; //Human
+        unit_op[1] = [2, 2, 7, 0, 0]; //Elf
+        unit_op[2] = [1, 3, 8, 0, 160]; //Orc
+        unit_op[3] = [2, 5, 10, 0, 6]; //Dwarf
+        unit_op[4] = [2, 5, 10, 1, 35]; //Troll
+        unit_op[5] = [0, 2, 6, 0, 8]; //Halfling
+
+        unit_dp[0] = [2, 5, 11, 0, 20]; //Human
+        unit_dp[1] = [1, 10, 10, 0, 0]; //Elf
+        unit_dp[2] = [2, 3, 8, 0, 160]; //Orc
+        unit_dp[3] = [2, 6, 8, 0, 3]; //Dwarf
+        unit_dp[4] = [3, 4, 10, 0, 35]; //Troll
+        unit_dp[5] = [1, 2, 4, 0, 8]; //Halfling
         var raw_op, raw_dp, mod_op, mod_dp;
+        var craw_op, craw_dp, cmod_op, cmod_dp;
         
+        //adds op, dp and mu info + military/magic sci dropdowns
+        $('#armyinfo table:nth-last-child(7)').before('<table><tr><td>Magic science: <select id="magisci"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></td></tr></table>');
+        if (race !== 2) //Elf
+            $('#magisci').parent().parent().parent().hide();
+        $('#armyinfo table:nth-last-child(7)').before('<table style="float:left;"><tr><td>Military science: <select id="milisci"><option selected>0 Raw</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></td></tr></table>');
+        $('#armyinfo table:nth-last-child(7)').before('<div style="clear:both;"></div>');
+        $('#armyinfo table:nth-last-child(7)').before('<table style="float:left;"><tr><td><span class="underdotted" id="mod_unmod_text" title="Archmages are counted 0/0. Peasants give 0.05 defense.">Raw power</span>: <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="raw_op">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="raw_dp">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif"><span id="mus">0</span></td></tr></table>');
+        if ($('#located').text() !== 'on mission')
+        {
+            $('#armyinfo table:nth-last-child(7)').before('<span style="float:left;">&nbsp;&nbsp;</span><table id="city_def"><tr><td><span class="underdotted" id="cmod_unmod_text" title="Archmages are counted 0/0. Peasants give 0.05 defense.">City raw power</span>: <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="craw_op">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="craw_dp">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif"><span id="cmus">0</span></td></tr></table>');
+        }
+        $('#armyinfo table:nth-last-child(7)').before('<div style="clear:both;"></div>');
+        
+        //calculates op and dp
         function calc_raw_power()
         {
-            unit_op[0] = [3, 4, 11, 0, 40]; //Human
-            unit_op[1] = [2, 2, 7, 0, 3*magic_science]; //Elf
-            unit_op[2] = [1, 3, 8, 0, 160]; //Orc
-            unit_op[3] = [2, 5, 10, 0, 6]; //Dwarf
-            unit_op[4] = [2, 5, 10, 1, 35]; //Troll
-            unit_op[5] = [0, 2, 6, 0, 8]; //Halfling
+            military_science = parseInt($('#milisci option:selected').text());
+            magic_science = parseInt($('#magisci option:selected').text());
+            unit_op[1][4] = 3*magic_science;
+            unit_dp[1][4] = 3*magic_science;
 
-            unit_dp[0] = [2, 5, 11, 0, 20]; //Human
-            unit_dp[1] = [1, 10, 10, 0, 3*magic_science]; //Elf
-            unit_dp[2] = [2, 3, 8, 0, 160]; //Orc
-            unit_dp[3] = [2, 6, 8, 0, 3]; //Dwarf
-            unit_dp[4] = [3, 4, 10, 0, 35]; //Troll
-            unit_dp[5] = [1, 2, 4, 0, 8]; //Halfling
-
-            raw_op = parseInt($('#s1').text())*unit_op[race-1][0] + parseInt($('#s2').text())*unit_op[race-1][1] + parseInt($('#s3').text())*unit_op[race-1][2] +
-                parseInt($('#s4').text())*unit_op[race-1][3] + parseInt($('#s5').text())*unit_op[race-1][4];
-            raw_dp = parseInt($('#s1').text())*unit_dp[race-1][0] + parseInt($('#s2').text())*unit_dp[race-1][1] + parseInt($('#s3').text())*unit_dp[race-1][2] +
-                parseInt($('#s4').text())*unit_dp[race-1][3] + parseInt($('#s5').text())*unit_dp[race-1][4] + parseInt($('#army_peasants').text())*0.05;
-            //var mod_op = raw_op*(1 + military_science*0.1)*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
-            //var mod_dp = raw_dp*(1 + military_science*0.1)*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
+            raw_op = parseInt($('#s1').text().replace(',',''))*unit_op[race-1][0] + parseInt($('#s2').text().replace(',',''))*unit_op[race-1][1] + parseInt($('#s3').text().replace(',',''))*unit_op[race-1][2] +
+                parseInt($('#s4').text().replace(',',''))*unit_op[race-1][3] + parseInt($('#s5').text().replace(',',''))*unit_op[race-1][4];
+            raw_dp = parseInt($('#s1').text().replace(',',''))*unit_dp[race-1][0] + parseInt($('#s2').text().replace(',',''))*unit_dp[race-1][1] + parseInt($('#s3').text().replace(',',''))*unit_dp[race-1][2] +
+                parseInt($('#s4').text().replace(',',''))*unit_dp[race-1][3] + parseInt($('#s5').text().replace(',',''))*unit_dp[race-1][4] + parseInt($('#army_peasants').text().replace(',',''))*0.05;
+            mod_op = Math.round(raw_op*(1 + military_science*0.1)); //*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
+            mod_dp = Math.round(raw_dp*(1 + military_science*0.1)); //Math.round((raw_dp*(1 + military_science*0.1) + 0.00001)*100)/100 //*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
+            if ($('#located').text() !== 'on mission')
+            {
+                craw_op = parseInt($('#cityS1').text().replace(',',''))*unit_op[race-1][0] + parseInt($('#cityS2').text().replace(',',''))*unit_op[race-1][1] + parseInt($('#cityS3').text().replace(',',''))*unit_op[race-1][2] +
+                    parseInt($('#cityS4').text().replace(',',''))*unit_op[race-1][3] + parseInt($('#cityS5').text().replace(',',''))*unit_op[race-1][4];
+                craw_dp = parseInt($('#cityS1').text().replace(',',''))*unit_dp[race-1][0] + parseInt($('#cityS2').text().replace(',',''))*unit_dp[race-1][1] + parseInt($('#cityS3').text().replace(',',''))*unit_dp[race-1][2] +
+                    parseInt($('#cityS4').text().replace(',',''))*unit_dp[race-1][3] + parseInt($('#cityS5').text().replace(',',''))*unit_dp[race-1][4] + parseInt($('#city_peasants').text().replace(',',''))*0.05;
+                cmod_op = Math.round(craw_op*(1 + military_science*0.1)); //*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
+                cmod_dp = Math.round(craw_dp*(1 + military_science*0.1)); //*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
+            }
         }
 
-        calc_raw_power();
-        $('#armyinfo table:eq(1)').before('<table><tr><td><span class="underdotted" title="Archmages are counted 0/0. Peasants give 0.05 defense.">Raw power</span>: <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="raw_op">' + numberWithCommas(raw_op) + '</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="raw_dp">' + numberWithCommas(raw_dp) + '</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif"><span id="mus">' + numberWithCommas(parseInt($('#s4').text())) + '</span></td></tr></table>');
-        $('select').change(function () {
+        $('#magisci, #milisci, select:eq(0)').change(function () {
             calc_raw_power();
-            $('#raw_op').text(numberWithCommas(raw_op));
-            $('#raw_dp').text(numberWithCommas(raw_dp));
-            $('#mus').text(numberWithCommas(parseInt($('#s4').text())));
+            $('#raw_op').text(numberWithCommas(mod_op));
+            $('#raw_dp').text(numberWithCommas(mod_dp));
+            $('#mus').text(numberWithCommas(parseInt($('#s4').text().replace(',',''))));
+            if (military_science === 0)
+                $('#mod_unmod_text').text('Raw power');
+            else
+                $('#mod_unmod_text').text('Modded power');
+            
+            if ($('#located').text() !== 'on mission')
+            {
+                $('#city_def').show();
+                $('#craw_op').text(numberWithCommas(cmod_op));
+                $('#craw_dp').text(numberWithCommas(cmod_dp));
+                $('#cmus').text(numberWithCommas(parseInt($('#cityS4').text().replace(',',''))));
+                if (military_science === 0)
+                    $('#cmod_unmod_text').text('City raw power');
+                else
+                    $('#cmod_unmod_text').text('City modded power');
+            }
+            else
+            {
+                $('#city_def').hide();
+            }
         });
-      
+        
+        //initialize op/dp/mu
+        $('#milisci').change();
+        
+        /*$('a[href*="javaScript:transfer("]').each(function (index) {
+            $(this).attr('href', $(this).attr('href').replace("');", "#gg');"));
+        });*/
+        
     }
     
     if (url.indexOf('scoutTerrain.asp') !== -1)
@@ -1633,6 +1713,80 @@ this.value = " + buildable_b.toString() + "; \
         $('#infotext').append('<p>All one and two letter words, excessive spaces and non-alphabetical characters will be removed from the name.</p>');
     }
     
+    if (url.indexOf('menu.asp') !== -1)
+    {
+        $('#mslot2').after($('#mslot1').detach());
+        $('#mslot7').after($('#mslot8').detach());
+    }
+    
+    //market buy
+    if ((url.indexOf('option=sell') === -1) && ((url.indexOf('market2.asp?option=buy') !== -1) || (url.indexOf('market2.asp') !== -1)))
+    {
+        if ($('#main').text().indexOf('or buy something else') === -1)
+        {
+            var resources_info = $('script:eq(3)').html();
+            resources_info = resources_info.replace(/[^0-9&]/g, '');
+            resources_info = resources_info.split("&");
+            var g_gold = resources_info[0].replace(',', '');
+
+            var total_cost_buy = $('#totalCost');
+            var input_total_cost_buy = $('<input>')
+            .attr('id', 'icost');
+            total_cost_buy.after(input_total_cost_buy);
+            total_cost_buy.hide();
+
+            $('#main input:eq(0)').on('keyup', function () {
+                if (parseInt($('#main input:eq(0)').val()) > Math.round(parseInt(g_gold)/parseFloat( sell[document.buy.from.selectedIndex][2]/ sell[document.buy.from.selectedIndex][1] )))
+                    $('#main input:eq(0)').val(Math.round(parseInt(g_gold)/parseFloat( sell[document.buy.from.selectedIndex][2]/ sell[document.buy.from.selectedIndex][1] )));
+                calcCost();
+                input_total_cost_buy.val(total_cost_buy.text());
+                if (input_total_cost_buy.val() === '0')
+                    input_total_cost_buy.val('');
+                if ($('#main input:eq(0)').val() === '0')
+                    $('#main input:eq(0)').val('');
+                $('#infotext').html(numberWithCommas($('#infotext').html()));
+            });
+
+            $(input_total_cost_buy).on('keyup', function () {
+                if (parseInt(input_total_cost_buy.val()) > parseInt(sell[document.buy.from.selectedIndex][2]))
+                    input_total_cost_buy.val(sell[document.buy.from.selectedIndex][2]);
+                if (parseInt(input_total_cost_buy.val()) > parseInt(g_gold))
+                    input_total_cost_buy.val(g_gold);
+                $('#main input:eq(0)').val(Math.round(input_total_cost_buy.val()/parseFloat( sell[document.buy.from.selectedIndex][2]/ sell[document.buy.from.selectedIndex][1] ))); // $('select:eq(0) option:selected').text().replace(/[^0-9.]+/g, '')
+                document.buy.marketID.value=sell[document.buy.from.selectedIndex][4];
+                if (input_total_cost_buy.val() === '0')
+                    input_total_cost_buy.val('');
+                if ($('#main input:eq(0)').val() === '0')
+                    $('#main input:eq(0)').val('');
+                $('#infotext').html(numberWithCommas($('#infotext').html()));
+            });
+
+            $('select').change(function () {
+                if (parseInt(input_total_cost_buy.val()) > parseInt(g_gold))
+                    //input_total_cost_buy.val(g_gold);
+                    $('#main input:eq(0)').val(Math.round(parseInt(g_gold)/parseFloat( sell[document.buy.from.selectedIndex][2]/ sell[document.buy.from.selectedIndex][1] )));
+                calcCost();
+                input_total_cost_buy.val(total_cost_buy.text());
+                if (input_total_cost_buy.val() === '0')
+                    input_total_cost_buy.val('');
+                if ($('#main input:eq(0)').val() === '0')
+                    $('#main input:eq(0)').val('');
+                $('#infotext').html(numberWithCommas($('#infotext').html()));
+            });
+            
+            //get "price" from dropdown by getting the content between ( and ), and inset it in the "Price:" element when it loads (currently it's empty)
+            
+            $('#main input:eq(0)').css('float', 'left');
+            $('#main input:eq(0)').after('<button class="button" style="float: left" onclick="document.buy.buyAmount.value = Math.min(parseInt(sell[document.buy.from.selectedIndex][1]), Math.round(parseInt(frame.resources.document.getElementById(\'gold\').innerHTML.replace(/[^0-9]+/g,\'\'))/parseFloat( sell[document.buy.from.selectedIndex][2]/ sell[document.buy.from.selectedIndex][1] ))).toString(); document.buy.marketID.value=sell[document.buy.from.selectedIndex][4]; calcCost(); document.getElementById(\'icost\').value = document.getElementById(\'totalCost\').innerHTML; if (document.getElementById(\'icost\').value === \'0\') document.getElementById(\'icost\').value = \'\'; if (document.buy.buyAmount.value === \'0\') document.buy.buyAmount.value = \'\'; ">Max</button>');
+
+        }
+    }
+    
+    //market sell
+    if ((url.indexOf('option=sell') !== -1))
+    {
+          $(document.sell.amount).after('<a class="button" onclick="document.sell.amount.value = frame.resources.document.getElementById(document.sell.vad.value).innerHTML.replace(/[^0-9]+/g,\'\'); calcprice(document.sell.price); if (document.sell.amount.value === \'0\') document.sell.amount.value = \'\'; if (document.sell.price.value === \'0\') document.sell.price.value = \'\'; ">Max</a>');
+    }
     
 
 });
