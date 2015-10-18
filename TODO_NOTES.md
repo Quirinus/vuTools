@@ -34,7 +34,7 @@
 - map: when hovering over a city, show line of sight distance according to city size (does this matter?), gt. use the intern function to draw the fog of war limit, or use a circle. terrain?
 - map: when hovering over an army, show line of sight distance. use the intern function to draw the fog of war limit, or use a circle. terrain?
 - map: when selecting move destination of an army, make it clickable anywhere (on top of other armies). z-order collision?
-- map: untangle stacked armies: when an army is chosen from the dropdown menu: calculate all armies in range (or find function in game js). make a button that either: cycles trough the armies and makes the current one's z-order higher, and other armies default. OR make it pop out a div with clones of all those armies' inside (except don't clone ID). also put them above your own. in case you moved over allied armies and can't click on them.
+- map: untangle stacked armies: when an army is chosen from the dropdown menu: calculate all armies in range (or find function in game js). make a button that either: cycles trough the armies and makes the current one's z-order higher, and other armies default. OR make it pop out a div with clones of all those armies' inside (except don't clone ID). also put them above your own. in case you moved over allied armies and can't click on them. moveArmy() function in armyInfo.js, needs currentArmy (ID), armys, selectedArmy
 - hide/remove some waypoints (from kd page list and from map)
 - add extra X or some other sign like for armies of the last size, or two rows, one with 3X and the other with 2X
 - wut, opens when you click on the KD button: http://visual-utopia.com/forum.asp?f=Childrens%20Playground&t=Battle%20Reports&replies=42
@@ -70,8 +70,15 @@
 -  training: title explaining mobilization and mouse pointer when you hover over (xx mobilized) and (xx/yy days)
 -  training: add unit abilites descriptions; ranged troops can defend vs catapults; last tier unit specialty; gaia; nazguls; mages;
 -  training: add base training times for comparison (with no milisci, arms or mobilization; don't forget to count in base orc bonus):
+- menu: add the city that the army is in in the dropdown menu, like it's in army window (see bodyLoad(l, p, m) in menu.js)
+- army: group the dropdown options into optgroups by cities and 'on mission'
+
 
 DONE:
+- army: add the city that the army is in in the dropdown menu
+- add op/dp/mu stats to army window to each tier + peasants
+- fix army screen city power and city link when in allied city (remove both)
+- army: change    Peasants:	--> Ready: like the other t troops; move it under the pic, merge tables
 -  in training window, add max button, and costs next to input boxes
 - when creating an army/city, add a note that 1 and 2 letter words are removed, and any extra space is turned to one space, and the result is trimmed on both sides
 - map: army: make the army size indicators link to the army as well. like the XXXX
@@ -413,3 +420,194 @@ LoS GT = extra line of sight from GuardTowers (max 1000). GuardTowers = LoSGT*2 
 From what I can see in the code, arma makes all army sizes move equally (scout speed = horde speed).
 
 Armies of pure tier3 troops still have a slight bonus over others though, but not as much as before.
+
+
+armys[2][0] = "1537379"; //armyID
+armys[2][1] = "Cvbnc"; //army name
+armys[2][2] = "3"; //t1
+armys[2][3] = "30"; //t2
+armys[2][4] = "0"; //t3
+armys[2][5] = "0"; //t4 = mu
+armys[2][6] = "0"; //t5
+armys[2][7] = "846"; //x?
+armys[2][8] = "2050"; //y?
+armys[2][9] = "493346"; //closest cityID to bounce to?
+armys[2][10] = "97"; //morale
+armys[2][11] = "1"; //xp?
+armys[2][12] = "1"; //world? race?
+armys[2][13] = "Odyssey"; //in city name
+armys[2][14] = "493346"; //in city ID
+armys[2][15] = "214"; //t1 in city
+armys[2][16] = "5877"; //t2 in city
+armys[2][17] = "42541"; //t3 in city
+armys[2][18] = "39947"; //t4 = mu in city
+armys[2][19] = "0"; //t5 in city
+armys[2][20] = "";
+armys[2][21] = "";
+armys[2][22] = "90599"; //city owner ID?
+armys[2][23] = "1"; //xp?
+armys[2][24] = "";
+armys[2][25] = "";
+armys[2][26] = "6"; //t1 injured
+armys[2][27] = "404"; //t2 injured
+armys[2][28] = "2958"; //t3 injured
+armys[2][29] = "0"; //t4 = mu injured
+armys[2][30] = "0"; //t5 injured
+armys[2][31] = "90599"; //city owner ID?
+armys[2][32] = "0";
+armys[2][33] = "272541"; //peasants in city
+armys[2][34] = "5"; //direction
+armys[2][35] = "0";
+armys[2][36] = "0";
+armys[2][37] = "0";
+armys[2][38] = "0";
+armys[2][39] = "0";
+armys[2][40] = "0";
+armys[2][41] = "15330";
+armys[2][42] = "0";
+armys[2][43] = "0";
+armys[2][44] = "0";
+armys[2][45] = "0";
+
+armys[4][0] = "1537709";
+armys[4][1] = "Pozo";
+armys[4][2] = "15";
+armys[4][3] = "0";
+armys[4][4] = "0";
+armys[4][5] = "19634";
+armys[4][6] = "0";
+armys[4][7] = "985";
+armys[4][8] = "1884";
+armys[4][9] = "0";
+armys[4][10] = "26";
+armys[4][11] = "0";
+armys[4][12] = "1";
+armys[4][13] = "";
+armys[4][14] = "";
+armys[4][15] = "";
+armys[4][16] = "";
+armys[4][17] = "";
+armys[4][18] = "";
+armys[4][19] = "";
+armys[4][20] = "";
+armys[4][21] = "";
+armys[4][22] = "";
+armys[4][23] = "";
+armys[4][24] = "";
+armys[4][25] = "";
+armys[4][26] = "0";
+armys[4][27] = "0";
+armys[4][28] = "0";
+armys[4][29] = "0";
+armys[4][30] = "0";
+armys[4][31] = "";
+armys[4][32] = "0";
+armys[4][33] = "0";
+armys[4][34] = "-3";
+armys[4][35] = "0";
+armys[4][36] = "0";
+armys[4][37] = "0";
+armys[4][38] = "0";
+armys[4][39] = "0";
+armys[4][40] = "0";
+armys[4][41] = "";
+armys[4][42] = "0";
+armys[4][43] = "0";
+armys[4][44] = "0";
+armys[4][45] = "0";
+
+
+armys[1][0] = "1536928";
+armys[1][1] = "Hai Binh Laden";
+armys[1][2] = "0";
+armys[1][3] = "0";
+armys[1][4] = "1";
+armys[1][5] = "0";
+armys[1][6] = "0";
+armys[1][7] = "806";
+armys[1][8] = "1941";
+armys[1][9] = "0";
+armys[1][10] = "99";
+armys[1][11] = "0";
+armys[1][12] = "1";
+armys[1][13] = "";
+armys[1][14] = "";
+armys[1][15] = "";
+armys[1][16] = "";
+armys[1][17] = "";
+armys[1][18] = "";
+armys[1][19] = "";
+armys[1][20] = "";
+armys[1][21] = "";
+armys[1][22] = "";
+armys[1][23] = "";
+armys[1][24] = "";
+armys[1][25] = "";
+armys[1][26] = "0";
+armys[1][27] = "0";
+armys[1][28] = "0";
+armys[1][29] = "0";
+armys[1][30] = "0";
+armys[1][31] = "";
+armys[1][32] = "0";
+armys[1][33] = "0";
+armys[1][34] = "3";
+armys[1][35] = "0";
+armys[1][36] = "0";
+armys[1][37] = "0";
+armys[1][38] = "0";
+armys[1][39] = "0";
+armys[1][40] = "0";
+armys[1][41] = "";
+armys[1][42] = "0";
+armys[1][43] = "0";
+armys[1][44] = "0";
+armys[1][45] = "0";
+
+
+armys[5][0] = "1537491";
+armys[5][1] = "Hjajajaja";
+armys[5][2] = "129";
+armys[5][3] = "3278";
+armys[5][4] = "25885";
+armys[5][5] = "21444";
+armys[5][6] = "0";
+armys[5][7] = "926";
+armys[5][8] = "2160";
+armys[5][9] = "493347";
+armys[5][10] = "24";
+armys[5][11] = "0";
+armys[5][12] = "1";
+armys[5][13] = "Delta Tiny";
+armys[5][14] = "493347";
+armys[5][15] = "23";
+armys[5][16] = "4846";
+armys[5][17] = "52567";
+armys[5][18] = "21236";
+armys[5][19] = "33000";
+armys[5][20] = "";
+armys[5][21] = "";
+armys[5][22] = "90370";
+armys[5][23] = "0";
+armys[5][24] = "";
+armys[5][25] = "";
+armys[5][26] = "38";
+armys[5][27] = "1049";
+armys[5][28] = "8286";
+armys[5][29] = "6750";
+armys[5][30] = "0";
+armys[5][31] = "90370";
+armys[5][32] = "0";
+armys[5][33] = "58";
+armys[5][34] = "5";
+armys[5][35] = "0";
+armys[5][36] = "0";
+armys[5][37] = "0";
+armys[5][38] = "0";
+armys[5][39] = "0";
+armys[5][40] = "0";
+armys[5][41] = "4500";
+armys[5][42] = "0";
+armys[5][43] = "0";
+armys[5][44] = "0";
+armys[5][45] = "0"

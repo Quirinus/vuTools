@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         vuTools
-// @version      0.24
+// @version      0.25
 // @author       Ivan Jelenić (Quirinus)
 // @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
 // @homepage     https://github.com/Quirinus/
@@ -146,7 +146,7 @@ $(document).ready(function ()
         var kd_own = ['Childrens Playground'];
         var kds_friendly = ['The Jester Empire'];
         var kds_neutral_nokd = ['', 'The Native People', '*No Kingdom*']; 
-        var kds_neutral = ['Mad and Dangerous', 'The Visual Utopia Empire'];
+        var kds_neutral = ['Mad and Dangerous', 'The Visual Utopia Empire', 'The Death Dealers', 'Forsaken'];
         var kds_enemy = ['The Collective', 'Zeon'];
         //var kds_relations = [kd_own, kds_friendly, kds_enemy];
         var color_own = '#B679F0'; //plum, lightgray, thistle, #B9F2FF, #B679F0
@@ -1018,11 +1018,11 @@ $(document).ready(function ()
             .css('width', '100%');
             $('form').prepend(top_train_table);
             
-            top_train_button = $('.button.big.city:eq(1)').clone();
+            top_train_button = $('.button.big.city:eq(0)').clone();
             
             top_train_row = $('<tr></tr>');
             top_train_table.append(top_train_row);
-            top_train_row.append($('<td></td>').css('width', '67%'), $('<td></td>').css('width', '33%').append(top_train_button));
+            top_train_row.append($('<td>&nbsp;</td>').css('width', '67%'), $('<td></td>').css('width', '33%').append(top_train_button));
             $('form').prev().remove(); //removes <br>
             $('form').prev().remove(); //removes <br>
         }
@@ -1120,7 +1120,8 @@ $(document).ready(function ()
             train_input.after(train_max_button);
         }
         $('#infotext').html(numberWithCommas($('#infotext').html()));
-
+        
+        $('form table:eq(4) tr:eq(3) td:eq(1)').append('&nbsp;&nbsp;<img src="https://static.visual-utopia.com/images/yellowball.gif">1');
     }
     
     if (url.indexOf('kingdom.asp?list=otherkingdoms') !== -1)
@@ -1558,13 +1559,43 @@ this.value = " + buildable_b.toString() + "; \
     if (url.indexOf('armyInfo.asp') !== -1)
     {
         
-        //makes the city name clickable
-        var army_array_index = -1;
+        //adds city names to army names in the dropdown
+        var army_select = $(document.armySelect.armys);
+        var army_select_options = army_select.find('option');
+        //army_select.append('<optgroup label="on mission" id="optg_on_mission"></optgroup>');
+        //$('#optg_on_mission').append(army_select_options.detach());
+        var select_opt_len = army_select_options.length;
+        var armys_len = armys.length;
+        for (i = 0; i < armys_len; i++)
+        {
+            for (j = 0; j < select_opt_len; j++)
+            {
+                if (armys[i][1] === army_select_options.eq(j).text())
+                {
+                    if (armys[i][13] !== '')
+                        army_select_options.eq(j).html('.&nbsp;&nbsp;' + armys[i][13] + ' | ' + army_select_options.eq(j).text());
+                }
+            }
+        }
+        $('#armyinfo > table:nth-child(3) th:eq(0)').text('Choose army (City | Army)');
+        
+        //sorts the dropdown alphabetically + cities on top
+        army_select_options.sort(function(a, b) { return $(a).text().toLowerCase().substring(1) < $(b).text().toLowerCase().substring(1) ? 1 : -1; });
+        army_select.html('').append(army_select_options);
+        for (j = 0; j < select_opt_len; j++)
+        {
+            if (army_select_options.eq(j).text().substring(0,1) === '.')
+                army_select_options.eq(j).text(army_select_options.eq(j).text().substring(1));
+        }
+        
+        //makes the city name clickable, add thousands spearators, checks if you're in your own city
         var army_city_id = -1;
-        function make_loc_clickable() {
+        var in_self_city = false;
+        function prep_army_page() {
             //adds thousand spearators
             $('#upkeep').text(numberWithCommas($('#upkeep').text()));
             $('#army_peasants').text(numberWithCommas($('#army_peasants').text()));
+            $('#army_peasants').parent().parent().find('th').html($('#army_peasants').parent().parent().find('th').html().replace('Peasants', 'Ready'));
             $('#s1').text(numberWithCommas($('#s1').text()));
             $('#s2').text(numberWithCommas($('#s2').text()));
             $('#s3').text(numberWithCommas($('#s3').text()));
@@ -1576,42 +1607,57 @@ this.value = " + buildable_b.toString() + "; \
             $('#s4i').text(numberWithCommas($('#s4i').text()));
             $('#s5i').text(numberWithCommas($('#s5i').text()));
             
-            //when in city
+            //if in city
             if ($('#located').text() !== 'on mission')
             {
-                var armys_len = armys.length;
                 for (i = 0; i < armys_len; i++)
                 {
                     if (armys[i][1] === $('h1').text())
                     {
-                        army_array_index = i;
+                        //armys[i][13] //city name
+                        army_city_id = armys[i][14];
+                        //check if you're in your own city
+                        if (parseInt(armys[i][22]) === parseInt(userID))
+                            in_self_city = true;
+                        else
+                            in_self_city = false;
                         break;
                     }
-                }
-                //armys[army_array_index][13] //city name
-                army_city_id = armys[army_array_index][14];
-                $('#located').html('<a href="train.asp?cityID=' + army_city_id + '">' + $('#located').text() + '</a>');
+                }              
+                if (in_self_city)
+                {
+                    //make the city name clickable
+                    $('#located').html('<a href="train.asp?cityID=' + army_city_id + '">' + $('#located').text() + '</a>');
 
-                //adds thousand spearators when in city
-                $('#city_peasants').text(numberWithCommas($('#city_peasants').text()));
-                if ($('#free_beds').text().indexOf('-') !== -1)
-                    $('#free_beds').text('-' + numberWithCommas($('#free_beds').text().replace('-', '')));
-                else
+                    //adds thousand spearators when in city
+                    $('#city_peasants').text(numberWithCommas($('#city_peasants').text()));
                     $('#free_beds').text(numberWithCommas($('#free_beds').text()));
-                $('#cityS1').text(numberWithCommas($('#cityS1').text()));
-                $('#cityS2').text(numberWithCommas($('#cityS2').text()));
-                $('#cityS3').text(numberWithCommas($('#cityS3').text()));
-                $('#cityS4').text(numberWithCommas($('#cityS4').text()));
-                $('#cityS5').text(numberWithCommas($('#cityS5').text()));
-
+                    $('#cityS1').text(numberWithCommas($('#cityS2').text()));
+                    $('#cityS2').text(numberWithCommas($('#cityS2').text()));
+                    $('#cityS3').text(numberWithCommas($('#cityS3').text()));
+                    $('#cityS4').text(numberWithCommas($('#cityS4').text()));
+                    $('#cityS5').text(numberWithCommas($('#cityS5').text()));
+                    
+                    //$('#city_peasants').parent().parent().parent().find('tr:eq(0)').before($('#cityResourcesText tbody tr:lt(2)').detach());
+                    //$('#city_peasants').parent().parent().parent().find('tr:eq(3)').before($('#cityResourcesText tbody tr:eq(0)').detach());
+                    //$('#city_peasants').parent().parent().parent().find('tr:eq(2)').before($('<tr><td colspan="2" style="height:2.7em">&nbsp;</td></tr>'));
+                    //$('#cityResourcesText').remove(); //no idea why remove removes the first row in the new table... probably jquery miss-assigning stuff or not keeping track of it
+                    
+                }
             }
+            else
+                in_self_city = false;
         }
         
-        make_loc_clickable();
-        $('select').change(function () {
-            make_loc_clickable();
-        });
+        //prep page on open
+        prep_army_page();
         
+        //prep page when you change army
+        $('select').change(function () {
+            prep_army_page();
+        });
+
+        //units stats
         var magic_science = 0;
         var military_science = 0;
         //var morale = $('#morale');
@@ -1619,14 +1665,14 @@ this.value = " + buildable_b.toString() + "; \
         var unit_op = [];
         var unit_dp = [];
         unit_op[0] = [3, 4, 11, 0, 40]; //Human
-        unit_op[1] = [2, 2, 7, 0, 0]; //Elf
+        unit_op[1] = [2, 2, 7, 0, '*']; //Elf
         unit_op[2] = [1, 3, 8, 0, 160]; //Orc
         unit_op[3] = [2, 5, 10, 0, 6]; //Dwarf
         unit_op[4] = [2, 5, 10, 1, 35]; //Troll
         unit_op[5] = [0, 2, 6, 0, 8]; //Halfling
 
         unit_dp[0] = [2, 5, 11, 0, 20]; //Human
-        unit_dp[1] = [1, 10, 10, 0, 0]; //Elf
+        unit_dp[1] = [1, 10, 10, 0, '*']; //Elf
         unit_dp[2] = [2, 3, 8, 0, 160]; //Orc
         unit_dp[3] = [2, 6, 8, 0, 3]; //Dwarf
         unit_dp[4] = [3, 4, 10, 0, 35]; //Troll
@@ -1640,15 +1686,15 @@ this.value = " + buildable_b.toString() + "; \
             $('#magisci').parent().parent().parent().hide();
         $('#armyinfo table:nth-last-child(7)').before('<table style="float:left;"><tr><td>Military science: <select id="milisci"><option selected>0 Raw</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option></select></td></tr></table>');
         $('#armyinfo table:nth-last-child(7)').before('<div style="clear:both;"></div>');
-        $('#armyinfo table:nth-last-child(7)').before('<table style="float:left;"><tr><td><span class="underdotted" id="mod_unmod_text" title="Archmages are counted 0/0. Peasants give 0.05 defense.">Raw power</span>: <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="raw_op">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="raw_dp">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif"><span id="mus">0</span></td></tr></table>');
-        if ($('#located').text() !== 'on mission')
-        {
-            $('#armyinfo table:nth-last-child(7)').before('<span style="float:left;">&nbsp;&nbsp;</span><table id="city_def"><tr><td><span class="underdotted" id="cmod_unmod_text" title="Archmages are counted 0/0. Peasants give 0.05 defense.">City raw power</span>: <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="craw_op">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="craw_dp">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif"><span id="cmus">0</span></td></tr></table>');
-        }
-        $('#armyinfo table:nth-last-child(7)').before('<div style="clear:both;"></div>');
+        $('#armyinfo table:nth-last-child(7)').before('<table style="float:left;"><tr><td><span id="mod_unmod_text">Raw power</span>: <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="a_op">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="a_dp">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif"><span id="a_mus">0</span></td></tr></table>');
+        //if ($('#located').text() !== 'on mission')
+        //{
+            $('#armyinfo table:nth-last-child(7)').before('<span style="float:left;">&nbsp;&nbsp;</span><table id="city_def"><tr><td><span id="c_mod_unmod_text">City raw power</span>: <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="c_op">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="c_dp">0</span></td><td><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif"><span id="c_mus">0</span></td></tr></table>');
+        //}
+        $('#armyinfo table:nth-last-child(7)').before('<div style="clear:both;">&nbsp;</div>');
         
-        //calculates op and dp
-        function calc_raw_power()
+        //calculates total op and dp, raw then mod, in army and in city
+        function calc_power()
         {
             military_science = parseInt($('#milisci option:selected').text());
             magic_science = parseInt($('#magisci option:selected').text());
@@ -1661,7 +1707,7 @@ this.value = " + buildable_b.toString() + "; \
                 parseInt($('#s4').text().replace(',',''))*unit_dp[race-1][3] + parseInt($('#s5').text().replace(',',''))*unit_dp[race-1][4] + parseInt($('#army_peasants').text().replace(',',''))*0.05;
             mod_op = Math.round(raw_op*(1 + military_science*0.1)); //*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
             mod_dp = Math.round(raw_dp*(1 + military_science*0.1)); //Math.round((raw_dp*(1 + military_science*0.1) + 0.00001)*100)/100 //*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
-            if ($('#located').text() !== 'on mission')
+            if (in_self_city)
             {
                 craw_op = parseInt($('#cityS1').text().replace(',',''))*unit_op[race-1][0] + parseInt($('#cityS2').text().replace(',',''))*unit_op[race-1][1] + parseInt($('#cityS3').text().replace(',',''))*unit_op[race-1][2] +
                     parseInt($('#cityS4').text().replace(',',''))*unit_op[race-1][3] + parseInt($('#cityS5').text().replace(',',''))*unit_op[race-1][4];
@@ -1671,40 +1717,62 @@ this.value = " + buildable_b.toString() + "; \
                 cmod_dp = Math.round(craw_dp*(1 + military_science*0.1)); //*(1 + parseInt($('#experience'))*0.015)*(parseInt($('#morale'))/100);
             }
         }
-
+        
+        //change numbers when you change military sci level (and magic sci level if you're elf, because of archmages)
         $('#magisci, #milisci, select:eq(0)').change(function () {
-            calc_raw_power();
-            $('#raw_op').text(numberWithCommas(mod_op));
-            $('#raw_dp').text(numberWithCommas(mod_dp));
-            $('#mus').text(numberWithCommas(parseInt($('#s4').text().replace(',',''))));
+            calc_power();
+            
+            //army stats
+            $('#a_op').text(numberWithCommas(mod_op));
+            $('#a_dp').text(numberWithCommas(mod_dp));
+            $('#a_mus').text(numberWithCommas(parseInt($('#s4').text().replace(',',''))));
             if (military_science === 0)
                 $('#mod_unmod_text').text('Raw power');
             else
                 $('#mod_unmod_text').text('Modded power');
             
-            if ($('#located').text() !== 'on mission')
+            if (in_self_city)
             {
                 $('#city_def').show();
-                $('#craw_op').text(numberWithCommas(cmod_op));
-                $('#craw_dp').text(numberWithCommas(cmod_dp));
-                $('#cmus').text(numberWithCommas(parseInt($('#cityS4').text().replace(',',''))));
+                $('#c_op').text(numberWithCommas(cmod_op));
+                $('#c_dp').text(numberWithCommas(cmod_dp));
+                $('#c_mus').text(numberWithCommas(parseInt($('#cityS4').text().replace(',',''))));
                 if (military_science === 0)
-                    $('#cmod_unmod_text').text('City raw power');
+                    $('#c_mod_unmod_text').text('City raw power');
                 else
-                    $('#cmod_unmod_text').text('City modded power');
+                    $('#c_mod_unmod_text').text('City modded power');
             }
             else
             {
                 $('#city_def').hide();
             }
+            
+            if (race == 2) //elf
+            {
+                $('#stat_op5').text(unit_op[1][4].toString() + '*');
+                $('#stat_dp5').text(unit_dp[1][4].toString() + '*');
+            }
         });
-        
+
         //initialize op/dp/mu
         $('#milisci').change();
         
         /*$('a[href*="javaScript:transfer("]').each(function (index) {
             $(this).attr('href', $(this).attr('href').replace("');", "#gg');"));
         });*/
+        
+        var magic_stat;
+        for (i = 0; i < 5; i++)
+        {
+            if (i === 3)
+                magic_stat = '<img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif">1';
+            else
+                magic_stat = '';
+            $('#s' + (i+1).toString()).parent().parent().parent().find('tr:eq(0) th').append(' <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="stat_op' + (i+1).toString() + '">' + unit_op[race-1][i].toString() + '</span> <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="stat_dp' + (i+1).toString() + '">' + unit_dp[race-1][i].toString() + '</span>' + magic_stat);
+            //$('#s' + (i+1).toString()).parent().parent().parent().find('tr:eq(0)').after('<tr><td colspan="2"><img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif">' + unit_op[race-1][i].toString() + ' <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif">' + unit_dp[race-1][i].toString() + '</td></tr>');
+        }
+        $('table:eq(10)').prepend('<tr><th colspan="2">Peasants <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif">0.05</th></tr>');
+
         
     }
     

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         vuTools
-// @version      0.24
+// @version      0.25
 // @author       Ivan Jelenić (Quirinus)
 // @description  A userscript to improve various user interface bits of the Visual Utopia browser game.
 // @homepage     https://github.com/Quirinus/

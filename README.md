@@ -1,4 +1,4 @@
-# vuTools <sub><sup>(v0.24)</sup></sub>
+# vuTools <sub><sup>(v0.25)</sup></sub>
 A userscript to improve various user interface bits of the Visual Utopia browser game.
 
 ![Shows different relation colors, army/city race & owner, additional army tooltip info](https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools_screenshot.png "Relation colors, army/city race & owner, additional army tooltip info")
@@ -43,9 +43,11 @@ A userscript to improve various user interface bits of the Visual Utopia browser
  
 ######Army window:
 - if army is stationed in city, city name links to city training window
-- shows army raw op/dp/mu (peasants give 0.05 dp)
+- added city names to the dropdown (armies in cities shown first)
+- shows raw unit op/dp/mp (if elf, select magic science for archmages)
+- shows army raw op/dp/mu
 - calculate mod op/dp by choosing military science level (if elf, magic too, for archmages)
-- shows city op/dp/mu if the army is in it
+- shows own city op/dp/mu if the army is in it
 - added commas to numbers
 
 ######Forum:
