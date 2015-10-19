@@ -72,6 +72,9 @@
 -  training: add base training times for comparison (with no milisci, arms or mobilization; don't forget to count in base orc bonus):
 - menu: add the city that the army is in in the dropdown menu, like it's in army window (see bodyLoad(l, p, m) in menu.js)
 - army: group the dropdown options into optgroups by cities and 'on mission'
+- army: save milisci and magisci to GM_setValue and GM_getValue
+- when building/training, if there's numbers entered in other fields, make max just fill out the rest of buildings/troops in the current field with the total-rest
+- army: make it select the armies that are in town, if selected from main menu and "Transfer" clicked
 
 
 DONE:

@@ -9,6 +9,7 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - armies display number of troops when you hover over them
 - armies display if they have only tier 3 troops and movement bonus if you hover over them
 - cities display the number of guardtowers up to 2,000 when you hover over them
+- cities display if the gates are none/open or closed when you hover over them
 - city and army (ruler) names colored according to kd relations:
  - self, own kd, friendly kd, neutral no kd, neutral kd, enemy kd
 - army size indicators, movement direction arrow and army path are white
@@ -25,6 +26,8 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - added total building costs, for each building, under it
 - added total gold costs to building all different buildings to top and bottom
 - added Max buttons next to each building type (turns to Clear when max buildable number is in the input box)
+- added 1:5 button next to the 3 resource buildings (splits buildings 1:5 = home:job)
+- added 1:6 button for halflings and dwarves, similar to above
 - input box now doesn't allow you to enter more than max amount of buildable units
 - added another build button to the top
 - added thousand separator commas almost everywhere
@@ -43,7 +46,7 @@ A userscript to improve various user interface bits of the Visual Utopia browser
  
 ######Army window:
 - if army is stationed in city, city name links to city training window
-- added city names to the dropdown (armies in cities shown first)
+- added city names to the dropdown, and alphabetically ordered (armies in cities shown first)
 - shows raw unit op/dp/mp (if elf, select magic science for archmages)
 - shows army raw op/dp/mu
 - calculate mod op/dp by choosing military science level (if elf, magic too, for archmages)

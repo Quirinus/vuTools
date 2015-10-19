@@ -15,6 +15,9 @@
 // ==/UserScript==
 
 
+// @grant        GM_getValue
+// @grant        GM_setValue
+
 $(document).ready(function ()
 {
     
@@ -120,7 +123,7 @@ $(document).ready(function ()
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "<span class='nonselectable'>,</span>");
     }*/
 
-    var text_info = '';                              
+    var text_info = '';
     if (url.indexOf('main.asp') != -1)
     {
         var citynames = $.makeArray($('.citynames'));
@@ -265,8 +268,17 @@ $(document).ready(function ()
         var shift_click_army_id = -1;
         var shift_click_x = -1;
         var shift_click_y = -1;
+        var shift_click_x_old = -1;
+        var shift_click_y_old = -1;
+        var armies_hide_index = [];
+        var armies_hide_id = [];
+        var armies_hide_len = 0;
+        var cycle_id = 0;
+        var cycle_z = 0;
         function get_armies_in_distance()
         {
+            armies_hide_index = [];
+            armies_hide_id = [];
             //alert($(armies[3]).attr('onclick').replace("pop('armyInfoE.asp?armyID=", '').replace("')", '').trim() == 1537446);
             for (i = 0; i < armies_info_len; i++)
             {
@@ -278,25 +290,66 @@ $(document).ready(function ()
                     {
                         if ($(armies[j]).attr('onclick').replace("pop('armyInfoE.asp?armyID=", '').replace("')", '').trim() == shift_click_army_id)
                         {
-                            $(armies[j]).css('z-index', '-50');
-                            $(armies[j]).next().css('z-index', '-50');
-                            $('img[style*="top: ' + (parseInt($(armies[j]).css('top'))-6).toString() + 'px; left: ' + (parseInt($(armies[j]).css('left'))-1).toString() + 'px"]').css('z-index', '-50');
-                            //alert('img[style*="top: ' + (parseInt($(armies[j]).css('top'))-6).toString() + 'px; left: ' + (parseInt($(armies[j]).css('left'))-1).toString() + 'px"]');
-                            //alert(shift_click_distance + ' ' + ai_size_signs[i] + '\n' + ai_name[i] + ': '+ ai_race[i] + ' ' + ai_size[i] + ' (' + ai_troops[i]  + ')\n' + ai_users[i] + ' ' + ai_user_kds[i] + ai_t3[i]);
+
+
+
+
+
+                            armies_hide_index[armies_hide_index.length] = j;
+                            armies_hide_id[armies_hide_id.length] = shift_click_army_id;
                         }
                     }
                 }
             }
-        }   
-        $("#hideSpill > img").click(function(e){ //#karta > img, #hideSpill > img, #hideSpill > div, html > body > div > div, .fow
-            if (e.shiftKey)
+
+
+            armies_hide_len = armies_hide_index.length;
+        }
+        function cycle_hide_armies()
+        {
+            //if (armies_hide_len > 0)
+            //{
+            for (i = 0; i < armies_hide_len; i++)
+            {
+                if (i === cycle_id)
+                {
+                    cycle_z = '1';
+                }
+                else
+                {
+                    cycle_z = '0';
+                }
+                j = armies_hide_index[i];
+                $(armies[j]).css('z-index', cycle_z);
+                $(armies[j]).next().css('z-index', cycle_z);
+                $('img[style*="top: ' + (parseInt($(armies[j]).css('top'))-6).toString() + 'px; left: ' + (parseInt($(armies[j]).css('left'))-1).toString() + 'px"]').css('z-index', cycle_z);
+                //alert('img[style*="top: ' + (parseInt($(armies[j]).css('top'))-6).toString() + 'px; left: ' + (parseInt($(armies[j]).css('left'))-1).toString() + 'px"]');
+                //alert(shift_click_distance + ' ' + ai_size_signs[i] + '\n' + ai_name[i] + ': '+ ai_race[i] + ' ' + ai_size[i] + ' (' + ai_troops[i]  + ')\n' + ai_users[i] + ' ' + ai_user_kds[i] + ai_t3[i]);
+            }
+            //}
+        }
+        function handle_cycle_distance(e)
+        {
+           if (e.shiftKey)
             {
                 if ($(this).attr('class') === 'fow')
                 {
                     alert('fow');
                     shift_click_x = e.pageX - $(this).parent().offset().left;
                     shift_click_y = e.pageY - $(this).parent().offset().top;
-                    get_armies_in_distance();
+                    if ((shift_click_x !== shift_click_x_old) && (shift_click_y !== shift_click_y_old))
+                    {
+                        get_armies_in_distance(shift_click_x, shift_click_y);
+                        cycle_id = 0;
+                    }
+                    else
+                    {
+                        cycle_id++;
+                        if (cycle_id === armies_hide_len)
+                            cycle_id = 0;
+                    }
+                    cycle_hide_armies();
+                    return;
                 }
                 else if ($(this).prop("tagName") === 'IMG')
                 {
@@ -305,14 +358,38 @@ $(document).ready(function ()
                         alert('#karta > img');
                         shift_click_x = e.pageX - $(this).parent().offset().left - 2500;
                         shift_click_y = e.pageY - $(this).parent().offset().top - 2500;
-                        get_armies_in_distance();
+                        if ((shift_click_x !== shift_click_x_old) && (shift_click_y !== shift_click_y_old))
+                        {
+                            get_armies_in_distance(shift_click_x, shift_click_y);
+                            cycle_id = 0;
+                        }
+                        else
+                        {
+                            cycle_id++;
+                            if (cycle_id === armies_hide_len)
+                                cycle_id = 0;
+                        }
+                        cycle_hide_armies();
+                        return;
                     }
                     else if ($(this).parent().attr('id') === 'hideSpill')
                     {
                         alert('#hideSpill > img');
                         shift_click_x = parseInt($(this).css('left')) + e.pageX - $(this).offset().left;
                         shift_click_y = parseInt($(this).css('top')) + e.pageY - $(this).offset().top;
-                        get_armies_in_distance();
+                        if ((shift_click_x !== shift_click_x_old) && (shift_click_y !== shift_click_y_old))
+                        {
+                            get_armies_in_distance(shift_click_x, shift_click_y);
+                            cycle_id = 0;
+                        }
+                        else
+                        {
+                            cycle_id++;
+                            if (cycle_id === armies_hide_len)
+                                cycle_id = 0;
+                        }
+                        cycle_hide_armies();
+                        return;
                     }
                 }
                 else if ($(this).prop("tagName") === 'DIV')
@@ -322,18 +399,48 @@ $(document).ready(function ()
                         alert('#hideSpill > div');
                         shift_click_x = parseInt($(this).css('left')) + e.pageX - $(this).offset().left;
                         shift_click_y = parseInt($(this).css('top')) + e.pageY - $(this).offset().top;
-                        get_armies_in_distance();
+                        if ((shift_click_x !== shift_click_x_old) && (shift_click_y !== shift_click_y_old))
+                        {
+                            get_armies_in_distance(shift_click_x, shift_click_y);
+                            cycle_id = 0;
+                        }
+                        else
+                        {
+                            cycle_id++;
+                            if (cycle_id === armies_hide_len)
+                                cycle_id = 0;
+                        }
+                        cycle_hide_armies();
+                        return;
                     }
                     else if (($(this).parent().prop("tagName") === 'DIV') && ($(this).parent().parent().prop("tagName") === 'BODY') && ($(this).parent().parent().parent().prop("tagName") === 'HTML'))
                     {
                         alert('html > body > div > div');
                         shift_click_x = e.pageX - $(this).offset().left;
                         shift_click_y = e.pageY - $(this).offset().top;
-                        get_armies_in_distance();
+                        if ((shift_click_x !== shift_click_x_old) && (shift_click_y !== shift_click_y_old))
+                        {
+                            get_armies_in_distance(shift_click_x, shift_click_y);
+                            cycle_id = 0;
+                        }
+                        else
+                        {
+                            cycle_id++;
+                            if (cycle_id === armies_hide_len)
+                                cycle_id = 0;
+                        }
+                        cycle_hide_armies();
+                        return;
                     }
                 }
             }
-        });*/
+
+        }
+        $("#hideSpill > img").off('click','#karta > img', handle_cycle_distance).off('click', '#hideSpill > div', handle_cycle_distance).off('click', 'html > body > div > div', handle_cycle_distance).off('click', '.fow', handle_cycle_distance).on('click', handle_cycle_distance);
+        $("#karta > img").off('click','#hideSpill > img', handle_cycle_distance).off('click', '#hideSpill > div', handle_cycle_distance).off('click', 'html > body > div > div', handle_cycle_distance).off('click', '.fow', handle_cycle_distance).on('click', handle_cycle_distance);
+        $("#hideSpill > div").off('click','#karta > img', handle_cycle_distance).off('click', '#hideSpill > img', handle_cycle_distance).off('click', 'html > body > div > div', handle_cycle_distance).off('click', '.fow', handle_cycle_distance).on('click', handle_cycle_distance);
+        $("html > body > div > div").off('click','#karta > img', handle_cycle_distance).off('#hideSpill > img', handle_cycle_distance).off('click', '#hideSpill > div', handle_cycle_distance).off('click', '.fow', handle_cycle_distance).on('click', handle_cycle_distance);
+        $(".fow").off('click','#karta > img', handle_cycle_distance).off('click', '#hideSpill > img', handle_cycle_distance).off('click', '#hideSpill > div', handle_cycle_distance).off('click', 'html > body > div > div', handle_cycle_distance).on('click', handle_cycle_distance);*/
         
         //armies
         $('div[style*="arrow"]').css('-webkit-filter', 'invert(100%)').css('filter', 'invert(100%)'); //css('z-index', '2'); // and add image map with coordinates from img, rotated for each
@@ -514,7 +621,7 @@ $(document).ready(function ()
 
         //city info from strCities:
         //cityID # city name # s # grc # x # y # ruler name # r ## kdID # g # of kd name # losgt # usrID # buildings
-        
+
         //s = city pic size
         //grc = city pic race
         //x = from -2500 to 2500 (4x2500x2500 = world size)
@@ -538,6 +645,7 @@ $(document).ready(function ()
         var ci_cityIDs = [];
         var ci_city_names = [];
         var ci_city_gts = [];
+        var ci_city_gates = [];
 
         for (i = 0; i < cities_info_len; i++)
         {
@@ -545,6 +653,7 @@ $(document).ready(function ()
             ci_cityIDs[i] = city_info[0];
             ci_city_names[i] = city_info[1];
             ci_users[i] = city_info[6];
+            ci_city_gates[i] = city_info[10];
             ci_city_gts[i] = numberWithCommas(parseInt(city_info[12])*2);
             //ci_userIDs[i] = city_info[11];
             /*if (city_info[10] == '')
@@ -577,6 +686,10 @@ $(document).ready(function ()
             {
                 city_gts = ci_city_gts[i] + ' guardtowers.';
             }
+            if ((ci_city_gates[i] === '') || (ci_city_gates[i] === '0'))
+                ci_city_gates[i] = 'Gates: Open or none.';
+            else if (ci_city_gates[i] === '1')
+                ci_city_gates[i] = 'Gates: Closed.';
             title = $(citynames[i]).attr('title');
             city_name = citynames[i].innerHTML;
             city_ID = $(citynames[i]).attr('onclick').replace("pop('cityInfoE.asp?cityID=", '').replace("')", '');
@@ -640,7 +753,7 @@ $(document).ready(function ()
             });
             
             title = numberWithCommas(title);
-            title = title + ' ' + city_gts;
+            title = title + ' ' + city_gts + ' ' + ci_city_gates[i];
             title = title.replace(': ', ':\r');
             $(citynames[i]).attr('title', title);
             
@@ -980,6 +1093,9 @@ $(document).ready(function ()
         var top_mob_button;
         var top_train_table;
         var top_train_row;
+        /*race = 2;
+        human = false;
+        $('.button.big.city:eq(0)').remove();*/
         
         var mobilize = false;
         if (human)
@@ -1017,14 +1133,13 @@ $(document).ready(function ()
             .attr('class', 'nostyle')
             .css('width', '100%');
             $('form').prepend(top_train_table);
-            
+
             top_train_button = $('.button.big.city:eq(0)').clone();
             
             top_train_row = $('<tr></tr>');
             top_train_table.append(top_train_row);
             top_train_row.append($('<td>&nbsp;</td>').css('width', '67%'), $('<td></td>').css('width', '33%').append(top_train_button));
-            $('form').prev().remove(); //removes <br>
-            $('form').prev().remove(); //removes <br>
+            //$('form').prev().remove(); //removes <br>
         }
         top_train_row.after("<tr><td style='text-align:right; font-weight:bold;'>Total training cost:</td><td style='text-align:center;'><span id='total_training_costs'>0</span> gold</td></tr>");
         $('form table:last-child').before("<table class='nostyle' style='width:100%'><tr><td style='text-align:right; font-weight:bold; width:66%;'>Total training cost:</td><td style='text-align:center; width:33%;'><span id='total_training_costs2'>0</span> gold</td></tr></table>");
@@ -1180,6 +1295,7 @@ $(document).ready(function ()
 
     if (url.indexOf('build.asp') !== -1)
     {
+        var race_b = parseInt($('#wizard').attr('src').replace(/[^0-9]/g,'').substring(0,1));
         $('a.button:eq(0)').text($('a.button:eq(0)').text().replace(' the gates', ''));
         var pop_percent = parseInt($('#b1 table tr:eq(5) td:eq(1)').text());
         var build_info = $('table:eq(0) tr:eq(1)');
@@ -1380,6 +1496,8 @@ $(document).ready(function ()
         var top_build_button;
         var top_build_row;
         var buildable_b;
+        var build_1_5_button;
+        var build_1_6_button;
         
         for (i = 1; i < 11; i++)
         {
@@ -1447,6 +1565,75 @@ this.value = " + buildable_b.toString() + "; \
                     sumBuild(); \
                  }");
             build_input.after(build_max_button);
+            
+            if (i < 5)
+            {
+                build_1_5_button = $('<button></button>')
+                .text('1:5')
+                .attr('class', 'button')
+                .attr('type', 'button')
+                .attr('id', build_id + '_button_1_5');
+                if (i === 1)
+                {
+                    build_1_5_button.attr('onclick', 
+                                          "document.getElementById('b_1').value = '" + (Math.ceil(buildable_b/5)).toString() + "'; \
+                                          document.getElementById('b_3').value = '" + (Math.floor(buildable_b*4/5)).toString() + "'; \
+                                          document.getElementById('b_1_button').innerHTML = 'Max'; \
+                                          document.getElementById('b_3_button').innerHTML = 'Max'; \
+                                          document.getElementById('b_1_total_cost').innerHTML = numberWithCommasx(" + (Math.ceil(buildable_b/5)*c_build_cost_gold).toString() + "); \
+                                          document.getElementById('b_3_total_cost').innerHTML = numberWithCommasx(" + (Math.floor(buildable_b*4/5)*c_build_cost_gold).toString() + "); \
+                                          sum_building_gold_cost(); \
+                                          sumBuild();");
+                }
+                else
+                {
+                    build_1_5_button.attr('onclick', 
+                                          "document.getElementById('b_1').value = '" + (Math.ceil(buildable_b/5)).toString() + "'; \
+                                          document.getElementById('b_" + i.toString() + "').value = '" + (Math.floor(buildable_b*4/5)).toString() + "'; \
+                                          document.getElementById('b_1_button').innerHTML = 'Max'; \
+                                          document.getElementById('" + build_id + "_button').innerHTML = 'Max'; \
+                                          document.getElementById('b_1_total_cost').innerHTML = numberWithCommasx(" + (Math.ceil(buildable_b/5)*c_build_cost_gold).toString() + "); \
+                                          document.getElementById('b_" + i.toString() + "_total_cost').innerHTML = numberWithCommasx(" + (Math.floor(buildable_b*4/5)*c_build_cost_gold).toString() + "); \
+                                          sum_building_gold_cost(); \
+                                          sumBuild();");
+                }
+                $('#b_' + i.toString() + '_button').after(build_1_5_button);
+            }
+
+            if (((race_b === 4) && (i === 3)) || ((race_b === 6) && (i === 2))) //dwarf or halfling
+            {
+                build_1_6_button = $('<button></button>')
+                .text('1:6')
+                .attr('class', 'button')
+                .attr('type', 'button')
+                .attr('id', build_id + '_button_1_6');
+                if (race_b === 4)
+                {
+                    build_1_6_button.attr('onclick', 
+                                          "document.getElementById('b_1').value = '" + (Math.ceil(buildable_b*6/31)).toString() + "'; \
+                                          document.getElementById('b_3').value = '" + (Math.floor(buildable_b*25/31)).toString() + "'; \
+                                          document.getElementById('b_1_button').innerHTML = 'Max'; \
+                                          document.getElementById('b_3_button').innerHTML = 'Max'; \
+                                          document.getElementById('b_1_total_cost').innerHTML = numberWithCommasx(" + (Math.ceil(buildable_b*6/31)*c_build_cost_gold).toString() + "); \
+                                          document.getElementById('b_3_total_cost').innerHTML = numberWithCommasx(" + (Math.floor(buildable_b*25/31)*c_build_cost_gold).toString() + "); \
+                                          sum_building_gold_cost(); \
+                                          sumBuild();");
+                    $('#b_3_button_1_5').after(build_1_6_button);
+                }
+                else if (race_b === 6)
+                {
+                    build_1_6_button.attr('onclick', 
+                                          "document.getElementById('b_1').value = '" + (Math.ceil(buildable_b*6/31)).toString() + "'; \
+                                          document.getElementById('b_2').value = '" + (Math.floor(buildable_b*25/31)).toString() + "'; \
+                                          document.getElementById('b_1_button').innerHTML = 'Max'; \
+                                          document.getElementById('b_2_button').innerHTML = 'Max'; \
+                                          document.getElementById('b_1_total_cost').innerHTML = numberWithCommasx(" + (Math.ceil(buildable_b*6/31)*c_build_cost_gold).toString() + "); \
+                                          document.getElementById('b_2_total_cost').innerHTML = numberWithCommasx(" + (Math.floor(buildable_b*25/31)*c_build_cost_gold).toString() + "); \
+                                          sum_building_gold_cost(); \
+                                          sumBuild();");
+                    $('#b_2_button_1_5').after(build_1_6_button);
+                }
+            }
         }
         $('form').prepend("<table class='nostyle' style='width: 100%'><tr><td style='text-align:right; font-weight:bold; width:67%;'>Total building gold cost:</td><td style='text-align:center; width:33%;'><span id='total_building_costs'>0</span> gold</td></tr></table>");
         $('form table:last-child').before("<table class='nostyle' style='width:100%'><tr><td style='text-align:right; font-weight:bold; width:67%;'>Total building gold cost:</td><td style='text-align:center; width:33%;'><span id='total_building_costs2'>0</span> gold</td></tr></table>");
@@ -1492,6 +1679,9 @@ this.value = " + buildable_b.toString() + "; \
         if(wall>0) document.getElementById('wall').style.display = 'block'; // && wall<maxWall
     }
     
+
+    
+    //navigation between train/build/new army/defense/gates
     if ((url.indexOf('train.asp') !== -1) || (url.indexOf('build.asp') !== -1))
     {
         //buttons/links to other windows
@@ -1511,7 +1701,6 @@ this.value = " + buildable_b.toString() + "; \
         
         //city_nav_tr.append('<td><a class="button big" style="background-image: url(\'images/but_army.gif\'); width: 170px; padding-left: 38px;" href="armyInfo.asp">Army</a></td>');
     }
-        
     if ((url.indexOf('newArmy.asp') !== -1) || (url.indexOf('NewArmy.asp') !== -1))
     {
         //buttons/links to other windows
@@ -1532,7 +1721,6 @@ this.value = " + buildable_b.toString() + "; \
         
         $('#infotext').append('<p>All one and two letter words, excessive spaces and non-alphabetical characters will be removed from the name.</p>');
     }
-    
     if ((url.indexOf('defence.asp') !== -1) || (url.indexOf('gates.asp') !== -1))
     {
         //buttons/links to other windows
@@ -1560,6 +1748,7 @@ this.value = " + buildable_b.toString() + "; \
     {
         
         //adds city names to army names in the dropdown
+        var army_selected = $(document.armySelect.armys).val();
         var army_select = $(document.armySelect.armys);
         var army_select_options = army_select.find('option');
         //army_select.append('<optgroup label="on mission" id="optg_on_mission"></optgroup>');
@@ -1579,7 +1768,7 @@ this.value = " + buildable_b.toString() + "; \
         }
         $('#armyinfo > table:nth-child(3) th:eq(0)').text('Choose army (City | Army)');
         
-        //sorts the dropdown alphabetically + cities on top
+        //sorts the dropdown alphabetically + puts cities on top
         army_select_options.sort(function(a, b) { return $(a).text().toLowerCase().substring(1) < $(b).text().toLowerCase().substring(1) ? 1 : -1; });
         army_select.html('').append(army_select_options);
         for (j = 0; j < select_opt_len; j++)
@@ -1587,6 +1776,10 @@ this.value = " + buildable_b.toString() + "; \
             if (army_select_options.eq(j).text().substring(0,1) === '.')
                 army_select_options.eq(j).text(army_select_options.eq(j).text().substring(1));
         }
+        //selects the army that was selected before the sorting
+        $(document.armySelect.armys).val(army_selected);
+        
+        
         
         //makes the city name clickable, add thousands spearators, checks if you're in your own city
         var army_city_id = -1;
@@ -1623,7 +1816,7 @@ this.value = " + buildable_b.toString() + "; \
                             in_self_city = false;
                         break;
                     }
-                }              
+                }
                 if (in_self_city)
                 {
                     //make the city name clickable
@@ -1632,7 +1825,7 @@ this.value = " + buildable_b.toString() + "; \
                     //adds thousand spearators when in city
                     $('#city_peasants').text(numberWithCommas($('#city_peasants').text()));
                     $('#free_beds').text(numberWithCommas($('#free_beds').text()));
-                    $('#cityS1').text(numberWithCommas($('#cityS2').text()));
+                    $('#cityS1').text(numberWithCommas($('#cityS1').text()));
                     $('#cityS2').text(numberWithCommas($('#cityS2').text()));
                     $('#cityS3').text(numberWithCommas($('#cityS3').text()));
                     $('#cityS4').text(numberWithCommas($('#cityS4').text()));
@@ -1696,6 +1889,8 @@ this.value = " + buildable_b.toString() + "; \
         //calculates total op and dp, raw then mod, in army and in city
         function calc_power()
         {
+            //military_science = parseInt(GM_getValue("milisci", parseInt($('#milisci option:selected').text()).toString()));
+            //magic_science = parseInt(GM_getValue("magisci", parseInt($('#milisci option:selected').text()).toString());
             military_science = parseInt($('#milisci option:selected').text());
             magic_science = parseInt($('#magisci option:selected').text());
             unit_op[1][4] = 3*magic_science;
@@ -1721,6 +1916,8 @@ this.value = " + buildable_b.toString() + "; \
         //change numbers when you change military sci level (and magic sci level if you're elf, because of archmages)
         $('#magisci, #milisci, select:eq(0)').change(function () {
             calc_power();
+            //GM_setValue("milisci", military_science.toString());
+            //GM_setValue("magisci", magic_science.toString());
             
             //army stats
             $('#a_op').text(numberWithCommas(mod_op));
@@ -1765,7 +1962,7 @@ this.value = " + buildable_b.toString() + "; \
         for (i = 0; i < 5; i++)
         {
             if (i === 3)
-                magic_stat = '<img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif">1';
+                magic_stat = ' <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/yellowball.gif">1';
             else
                 magic_stat = '';
             $('#s' + (i+1).toString()).parent().parent().parent().find('tr:eq(0) th').append(' <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/att2.gif"><span id="stat_op' + (i+1).toString() + '">' + unit_op[race-1][i].toString() + '</span> <img align="absmiddle" style="line-height: 18px; text-align: -webkit-center; vertical-align: middle;" src="https://static.visual-utopia.com/images/def6.gif"><span id="stat_dp' + (i+1).toString() + '">' + unit_dp[race-1][i].toString() + '</span>' + magic_stat);
@@ -1783,6 +1980,45 @@ this.value = " + buildable_b.toString() + "; \
     
     if (url.indexOf('menu.asp') !== -1)
     {
+        /*var strArmies = top.frames["map"].strArmies;
+        var armies_select = document.armyForm.armyID;
+        var armies_select_options = document.armyForm.armyID.options;
+        var armies_select_len = document.armyForm.armyID.options.length;
+        var armies_ids = [];
+        var armies_names = [];
+        
+        for (i = 0; i < armies_select_len - 1; i++)
+        {
+            armies_ids[i] = document.armyForm.armyID.options[i].value;
+            armies_names[i] = document.armyForm.armyID.options[i].innerHTML;
+        }
+        
+        var armies_info = strArmies.split('&');
+        armies_info.pop();
+        var armies_info_len = armies_info.length;
+        var army_info = '';
+        
+        var ai_users = [];
+        var ai_armyIDs = [];
+        var ai_name = [];
+        var ai_size_signs = [];
+        
+        for (i = 0; i < armies_info_len; i++)
+        {
+            army_info = armies_info[i].split('#');
+            ai_name[i] = army_info[1];
+            ai_armyIDs[i] = army_info[0];
+            ai_users[i] = army_info[4];
+            ai_size_signs[i] = army_size_signs[parseInt(army_info[9]) - 1];
+            if (armies_ids.indexOf(army_info[0]) !== -1)
+            {
+
+            }
+        }*/
+        
+        //can't find the city the army is in. at most I can add army info that's in strArmies, like size designations...
+        
+        
         $('#mslot2').after($('#mslot1').detach());
         $('#mslot7').after($('#mslot8').detach());
     }
