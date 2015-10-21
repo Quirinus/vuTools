@@ -1,4 +1,4 @@
-# vuTools <sub><sup>(v0.25)</sup></sub>
+# <a id="features"></a> vuTools <sub><sup>(v0.26)</sup></sub>
 A userscript to improve various user interface bits of the Visual Utopia browser game.
 
 ![Shows different relation colors, army/city race & owner, additional army tooltip info](https://raw.githubusercontent.com/Quirinus/vuTools/master/vuTools_screenshot.png "Relation colors, army/city race & owner, additional army tooltip info")
@@ -7,7 +7,7 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 ######Map:
 - all armies and cities have **[race]short_player_name** under them (the ones on armies are clickable)
 - armies display number of troops when you hover over them
-- armies display if they have only tier 3 troops and movement bonus if you hover over them
+- armies display if they have movement bonus (from having only mounted units) if you hover over them
 - cities display the number of guardtowers up to 2,000 when you hover over them
 - cities display if the gates are none/open or closed when you hover over them
 - city and army (ruler) names colored according to kd relations:
@@ -15,6 +15,8 @@ A userscript to improve various user interface bits of the Visual Utopia browser
 - army size indicators, movement direction arrow and army path are white
 - all names (except waypoints) have an an outline around them for easier spotting
 - clicking on the army size indicators or army ruler name opens up the army window
+- there's code for showing city/army vision range, but it's commented out (turn on if you want, can choose own/neutral/enemy kd)
+- made it possible to drag-scroll even if you click on city/waypoint/army-arrow images
 
 ######Build window:
 - added Tax% to the top; mouseover to see numbers
@@ -45,8 +47,9 @@ A userscript to improve various user interface bits of the Visual Utopia browser
  - changed button title to be more clear
  
 ######Army window:
-- if army is stationed in city, city name links to city training window
-- added city names to the dropdown, and alphabetically ordered (armies in cities shown first)
+- if army is stationed in own city, city name links to city training window
+- if army is stationed in own city, added quick navigation to the city build/train/new army/defense/gate windows
+- added city names to the army names dropdown, and alphabetically ordered (armies in cities shown first)
 - shows raw unit op/dp/mp (if elf, select magic science for archmages)
 - shows army raw op/dp/mu
 - calculate mod op/dp by choosing military science level (if elf, magic too, for archmages)

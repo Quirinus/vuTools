@@ -72,12 +72,17 @@
 -  training: add base training times for comparison (with no milisci, arms or mobilization; don't forget to count in base orc bonus):
 - menu: add the city that the army is in in the dropdown menu, like it's in army window (see bodyLoad(l, p, m) in menu.js)
 - army: group the dropdown options into optgroups by cities and 'on mission'
-- army: save milisci and magisci to GM_setValue and GM_getValue
+- army: save milisci and magisci to GM_setValue and GM_getValue (if I use @grant GM_setValue, which is required to use it, it removes the page DOM elements and JS variables to unsafeWindow.element and unsafeWindow.jsVarName)
 - when building/training, if there's numbers entered in other fields, make max just fill out the rest of buildings/troops in the current field with the total-rest
 - army: make it select the armies that are in town, if selected from main menu and "Transfer" clicked
+- new army: when clicking on new army in the city menu, when you move to the new army window, have that city selected (in some cases it doesn't auto select)
+- take army and city list from the main window, and find if some of them have the same coordinates. if yes, check if army is moving or not. if not, then it's in that city. use that in the city defense window to link army names to the city, and to add cities to the army names list in the menu.
 
 
 DONE:
+- army: for armies in cities, added that city's build/train/new army/defense/gate navigation to the top
+- map: armies that have movement bonus: they can be pure naz army as well, not only tier 3. so check race first.
+- make city images unclickable (select-trough), so you can scroll even if you click on their pic; with 'pointer-events', 'none'; done for city ruler race/name and army arrows too
 - army: add the city that the army is in in the dropdown menu
 - add op/dp/mu stats to army window to each tier + peasants
 - fix army screen city power and city link when in allied city (remove both)
